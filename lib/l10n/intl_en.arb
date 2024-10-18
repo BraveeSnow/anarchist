@@ -1,4 +1,6 @@
 {
+  "@@locale": "en",
+
   "navbarHome": "Home",
   "navbarSearch": "Search",
   "navbarAnime": "Anime",
@@ -6,5 +8,8 @@
   "navbarAccount": "Account",
   "searchPlaceholder": "Search for anything...",
   "searchTop100": "Top 100",
-  "searchTrending": "Trending"
+  "searchTrending": "Trending",
+  "loginEmail": "Email",
+  "loginPassword": "Password",
+  "loginButton": "Log In"
 }
