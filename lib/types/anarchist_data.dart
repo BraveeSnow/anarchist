@@ -14,7 +14,7 @@ class AnarchistData {
     return {
       'accessToken': accessToken,
       'refreshToken': refreshToken,
-      'tokenExpiry': tokenExpiry!.millisecondsSinceEpoch,
+      'tokenExpiry': tokenExpiry?.millisecondsSinceEpoch,
     };
   }
 }
