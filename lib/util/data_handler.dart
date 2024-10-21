@@ -10,22 +10,20 @@ class DataHandler {
   AnarchistData currentData = AnarchistData();
 
   Future<AnarchistData> readData() async {
-    File f = File('${await getApplicationDocumentsDirectory()}/$dataFilename');
-    AnarchistData schema = AnarchistData();
-    Map<String, dynamic> json;
+    File f = File(
+        '${(await getApplicationDocumentsDirectory()).path}/$dataFilename');
 
     if (!await f.exists()) {
       return AnarchistData();
     }
 
-    json = jsonDecode(await f.readAsString());
-    schema = json['accessToken'];
-
-    return schema;
+    return AnarchistData.fromJson(jsonDecode(await f.readAsString()));
   }
 
   void writeData(AnarchistData data) async {
-    File f = File('${await getApplicationDocumentsDirectory()}/$dataFilename');
+    File f = File(
+        '${(await getApplicationDocumentsDirectory()).path}/$dataFilename');
+
     if (!await f.exists()) {
       f = await f.create(recursive: true);
     }

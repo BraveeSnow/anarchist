@@ -37,6 +37,7 @@ class _AnarchistState extends State<Anarchist> {
     routes: [
       GoRoute(
         path: AnarchistMainPage.route,
+        // TODO - create a cleaner approach to logging in
         redirect: _verifyLogin,
         builder: (context, state) => const AnarchistMainPage(),
         routes: [
@@ -85,6 +86,7 @@ class _AnarchistState extends State<Anarchist> {
     schema = AnarchistData(
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
+      tokenExpiry: tokens.expiresIn,
     );
     Anarchist.dataHandler.writeData(schema);
     return AnarchistMainPage.route;
