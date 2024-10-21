@@ -1,38 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:anarchist/types/anarchist_data.dart';
 import 'package:path_provider/path_provider.dart';
-
-class DataSchema {
-  String? accessToken;
-  String? refreshToken;
-
-  DataSchema({this.accessToken, this.refreshToken});
-
-  DataSchema.fromJson(Map<String, dynamic> json)
-      : accessToken = json['accessToken'],
-        refreshToken = json['refreshToken'];
-
-  Map<String, dynamic> toJson() {
-    return {
-      'accessToken': accessToken,
-      'refreshToken': refreshToken,
-    };
-  }
-}
 
 class DataHandler {
   static const String dataFilename = 'data.json';
 
-  DataSchema currentData = DataSchema();
+  AnarchistData currentData = AnarchistData();
 
-  Future<DataSchema> readData() async {
+  Future<AnarchistData> readData() async {
     File f = File('${await getApplicationDocumentsDirectory()}/$dataFilename');
-    DataSchema schema = DataSchema();
+    AnarchistData schema = AnarchistData();
     Map<String, dynamic> json;
 
     if (!await f.exists()) {
-      return DataSchema();
+      return AnarchistData();
     }
 
     json = jsonDecode(await f.readAsString());
@@ -41,7 +24,7 @@ class DataHandler {
     return schema;
   }
 
-  void writeData(DataSchema data) async {
+  void writeData(AnarchistData data) async {
     File f = File('${await getApplicationDocumentsDirectory()}/$dataFilename');
     if (!await f.exists()) {
       f = await f.create(recursive: true);

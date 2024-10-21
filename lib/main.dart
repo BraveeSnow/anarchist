@@ -5,6 +5,7 @@ import 'package:anarchist/routes/account.dart';
 import 'package:anarchist/routes/home.dart';
 import 'package:anarchist/routes/list.dart';
 import 'package:anarchist/routes/search.dart';
+import 'package:anarchist/types/anarchist_data.dart';
 import 'package:anarchist/types/oauth_response.dart';
 import 'package:anarchist/util/data_handler.dart';
 import 'package:anarchist/util/oauth_handler.dart';
@@ -63,7 +64,7 @@ class _AnarchistState extends State<Anarchist> {
     }
 
     // go to login page if a token is not found
-    DataSchema schema = await Anarchist.dataHandler.readData();
+    AnarchistData schema = await Anarchist.dataHandler.readData();
     if (schema.accessToken != null) {
       return null;
     }
@@ -73,7 +74,7 @@ class _AnarchistState extends State<Anarchist> {
 
   static Future<String?> _authenticateUser(
       BuildContext context, GoRouterState state) async {
-    DataSchema schema;
+    AnarchistData schema;
     OAuthResponse? tokens =
         await OAuthHandler.retrieveToken(state.uri.queryParameters['code']!);
 
@@ -81,7 +82,7 @@ class _AnarchistState extends State<Anarchist> {
       return '/${LoginPage.route}';
     }
 
-    schema = DataSchema(
+    schema = AnarchistData(
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     );
