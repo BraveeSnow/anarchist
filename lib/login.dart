@@ -1,30 +1,40 @@
+import 'package:anarchist/util/oauth_handler.dart';
+import 'package:anarchist/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
+  static const String route = 'login';
+
   const LoginPage({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  String email = "";
-  String password = "";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 32),
-          child: Expanded(
+        child: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/splash.png'),
+              fit: BoxFit.fill,
+              alignment: Alignment.center,
+              opacity: 0.15,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 32),
             child: SafeArea(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  branding(),
-                  loginPrompt(),
+                  Expanded(
+                    child: branding(),
+                  ),
+                  Expanded(
+                    child: loginPrompt(context),
+                  ),
                 ],
               ),
             ),
@@ -35,38 +45,62 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget branding() {
-    return FractionallySizedBox(
-      widthFactor: 0.5,
-      child: Image.asset("assets/anarchist_transparent.png"),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        FractionallySizedBox(
+          widthFactor: 0.5,
+          child: Image.asset('assets/anarchist_transparent.png'),
+        ),
+        const Text("Anarchist", style: TextStyle(fontSize: 36)),
+      ],
     );
   }
 
-  Widget loginPrompt() {
-    return Column(
+  Widget loginPrompt(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        TextField(
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              hintText: AppLocalizations.of(context)!.loginEmail),
-          onChanged: (changed) {
-            email = changed;
-          },
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              hintText: AppLocalizations.of(context)!.loginPassword),
-          onChanged: (changed) {
-            password = changed;
-          },
-        ),
-        const SizedBox(height: 16),
         FilledButton.tonal(
-          onPressed: () {},
-          child: Text(AppLocalizations.of(context)!.loginButton),
-        ),
+            onPressed: () => showSkipPopup(context),
+            child: Text(AppLocalizations.of(context)!.loginSkip)),
+        FilledButton.tonalIcon(
+            onPressed: () async {
+              // do not launch browser as webview as per IETF
+              // https://www.rfc-editor.org/rfc/rfc8252.txt
+              await launchUrl(OAuthHandler.anilistAuthCodeEndpoint,
+                  mode: LaunchMode.externalApplication);
+            },
+            icon: Image.asset('assets/anilist.png', width: 24),
+            label: Text(AppLocalizations.of(context)!.loginConnect)),
       ],
+    );
+  }
+
+  void showSkipPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.loginSkipDialogTitle),
+          content: Text(AppLocalizations.of(context)!.loginSkipDialog),
+          actions: [
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: Text(AppLocalizations.of(context)!.loginSkipBack),
+            ),
+            TextButton(
+              onPressed: () {
+                context.push(AnarchistMainPage.route);
+              },
+              child: Text(AppLocalizations.of(context)!.loginSkipContinue),
+            ),
+          ],
+        );
+      },
     );
   }
 }
