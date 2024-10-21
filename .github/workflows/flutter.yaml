@@ -3,14 +3,14 @@ name: Flutter
 on:
   push:
     paths:
-      - lib/
-      - android/
-      - ios/
+      - 'lib/**'
+      - 'android/**'
+      - 'ios/**'
   pull_request:
     paths:
-      - lib/
-      - android/
-      - ios/
+      - 'lib/**'
+      - 'android/**'
+      - 'ios/**'
 
 jobs:
   lint:
