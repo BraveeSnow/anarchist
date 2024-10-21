@@ -4,9 +4,13 @@ on:
   push:
     paths:
       - lib/
+      - android/
+      - ios/
   pull_request:
     paths:
       - lib/
+      - android/
+      - ios/
 
 jobs:
   lint:
