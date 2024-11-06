@@ -1,4 +1,6 @@
 {
+  "@@locale": "en",
+
   "navbarHome": "Home",
   "navbarSearch": "Search",
   "navbarAnime": "Anime",
@@ -6,5 +8,11 @@
   "navbarAccount": "Account",
   "searchPlaceholder": "Search for anything...",
   "searchTop100": "Top 100",
-  "searchTrending": "Trending"
+  "searchTrending": "Trending",
+  "loginSkip": "Skip",
+  "loginConnect": "Connect with AniList",
+  "loginSkipDialogTitle": "Skip Login?",
+  "loginSkipDialog": "Without connecting your AniList account, your experience with Anarchist will be limited. You can still log in at any time.",
+  "loginSkipBack": "Back",
+  "loginSkipContinue": "Continue"
 }
