@@ -11,5 +11,6 @@ class OAuthResponse {
         refreshToken = json['refresh_token'],
         tokenType = json['token_type'],
         expiresIn = DateTime.fromMillisecondsSinceEpoch(
-            ((DateTime.now().second + json['expires_in'] as int) * 1000));
+            (DateTime.now().millisecondsSinceEpoch +
+                (json['expires_in'] as int) * 1000));
 }

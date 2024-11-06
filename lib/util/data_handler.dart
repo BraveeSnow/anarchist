@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:anarchist/types/anarchist_data.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DataSchema {
@@ -24,25 +25,23 @@ class DataSchema {
 class DataHandler {
   static const String dataFilename = 'data.json';
 
-  DataSchema currentData = DataSchema();
+  AnarchistData currentData = AnarchistData();
 
-  Future<DataSchema> readData() async {
-    File f = File('${await getApplicationDocumentsDirectory()}/$dataFilename');
-    DataSchema schema = DataSchema();
-    Map<String, dynamic> json;
+  Future<AnarchistData> readData() async {
+    File f = File(
+        '${(await getApplicationDocumentsDirectory()).path}/$dataFilename');
 
     if (!await f.exists()) {
-      return DataSchema();
+      return AnarchistData();
     }
 
-    json = jsonDecode(await f.readAsString());
-    schema = json['accessToken'];
-
-    return schema;
+    return AnarchistData.fromJson(jsonDecode(await f.readAsString()));
   }
 
-  void writeData(DataSchema data) async {
-    File f = File('${await getApplicationDocumentsDirectory()}/$dataFilename');
+  void writeData(AnarchistData data) async {
+    File f = File(
+        '${(await getApplicationDocumentsDirectory()).path}/$dataFilename');
+
     if (!await f.exists()) {
       f = await f.create(recursive: true);
     }
