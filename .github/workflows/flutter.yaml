@@ -19,5 +19,9 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - uses: actions/setup-java@v4.5.0
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
       - run: flutter build apk
-      - run: flutter build appbundle
