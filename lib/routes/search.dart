@@ -1,3 +1,4 @@
+import 'package:anarchist/util/search_query.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -10,7 +11,7 @@ class SearchPage extends StatefulWidget {
   State<StatefulWidget> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageState extends State<SearchPage> with SearchQueryHandler{
   SearchType type = SearchType.anime;
 
   @override
@@ -93,7 +94,12 @@ class _SearchPageState extends State<SearchPage> {
         },
       );
     }, suggestionsBuilder: (context, controller) {
-      return List.empty();
+      return fetchSearchResults(controller); //Maybe store past searches and grab them here?
     });
+  }
+
+  Future<List<SearchCard>> fetchSearchResults(SearchController controller) async {
+    final data = await fetchSearchCards(controller.text, type.name);
+    return data;
   }
 }
