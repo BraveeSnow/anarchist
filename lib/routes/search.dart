@@ -99,7 +99,7 @@ class _SearchPageState extends State<SearchPage> with SearchQueryHandler{
   }
 
   Future<List<SearchCard>> fetchSearchResults(SearchController controller) async {
-    final data = await fetchSearchCards(controller.text, type.name);
+    final data = await fetchTrending(type.name);
     return data;
   }
 }

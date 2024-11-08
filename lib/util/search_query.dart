@@ -139,9 +139,9 @@ mixin SearchQueryHandler {
 
   Future<List<SearchCard>> fetchTrending(String type, {int pageNumber = 1}) async {
     final searchQuery = """
-    query (\$search: String!) {
+    query {
       Page {
-        media(search: \$search, type: ${type.toUpperCase()}, sort: TRENDING_DESC) {
+        media(type: ${type.toUpperCase()}, sort: TRENDING_DESC) {
           id
           title {
             english
@@ -201,9 +201,9 @@ mixin SearchQueryHandler {
 
   Future<List<SearchCard>> fetchTop(String type, {int pageNumber = 1}) async {
     final searchQuery = """
-    query (\$search: String!) {
+    query {
       Page {
-        media(search: \$search, type: ${type.toUpperCase()}, sort: SCORE_DESC) {
+        media(type: ${type.toUpperCase()}, sort: SCORE_DESC) {
           id
           title {
             english
