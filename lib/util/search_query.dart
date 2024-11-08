@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:anarchist/types/anilist_data.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ class SearchCard extends StatelessWidget {
   late String nameEnglish;
   late String nameRomaji;
   late String coverImageURL;
+  late String coverImageURLHD;
 
   final MediaEntry entry;
 
@@ -22,6 +22,7 @@ class SearchCard extends StatelessWidget {
     nameEnglish = entry.englishName!;
     nameRomaji = entry.romajiName!;
     coverImageURL = entry.coverImageURL!;
+    coverImageURLHD = entry.coverImageURL!;
   }
 
   @override
@@ -94,6 +95,7 @@ mixin SearchQueryHandler {
           coverImage {
             color
             medium
+            extraLarge
           }
         }
       }
@@ -144,6 +146,7 @@ mixin SearchQueryHandler {
           coverImage {
             color
             medium
+            extraLarge
           }
         }
       }
@@ -188,6 +191,7 @@ mixin SearchQueryHandler {
           coverImage {
             color
             medium
+            extraLarge
           }
         }
       }
@@ -213,6 +217,7 @@ mixin SearchQueryHandler {
         final entry = MediaEntry.fromMap(element);
         searchResults.add(entry);
       }
+
     }
 
     return searchResults;
