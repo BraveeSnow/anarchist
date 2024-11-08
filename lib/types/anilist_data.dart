@@ -5,7 +5,7 @@ import 'dart:convert';
 
 //ToDo: Actually use this
 class MediaEntry {
-  int id;
+  late int id;
 
   MediaEntry(this.id);
 
@@ -14,4 +14,23 @@ class MediaEntry {
   String? nativeName;
   String? romajiName;
   String? coverImageURL;
+
+
+  MediaEntry.fromMap(Map<String, dynamic> media){
+
+    id = media["id"];
+
+    if(media.containsKey("title")){
+      englishName = media["title"]["english"] ?? "";
+      nativeName = media["title"]["native"] ?? "";
+      romajiName = media["title"]["romaji"] ?? "";
+    }
+
+    if(media.containsKey("coverImage")) {
+      coverImageURL = media["coverImage"]["medium"] ?? "";
+    }
+
+  }
+
+
 }

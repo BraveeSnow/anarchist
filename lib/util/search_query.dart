@@ -1,20 +1,23 @@
 import 'dart:convert';
 
+import 'package:anarchist/types/anilist_data.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class SearchCard extends StatelessWidget {
-  final String nameNative;
-  final String nameEnglish;
-  final String nameRomaji;
-  final String coverImageURL;
+  late String nameNative;
+  late String nameEnglish;
+  late String nameRomaji;
+  late String coverImageURL;
 
-  const SearchCard(
-      {super.key,
-        required this.nameNative,
-        required this.nameEnglish,
-        required this.nameRomaji,
-        required this.coverImageURL});
+  final MediaEntry entry;
+
+  SearchCard({super.key, required this.entry}){
+    nameNative = entry.nativeName!;
+    nameEnglish = entry.englishName!;
+    nameRomaji = entry.romajiName!;
+    coverImageURL = entry.coverImageURL!;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +71,7 @@ class SearchCard extends StatelessWidget {
 mixin SearchQueryHandler {
   String _baseAPIURL = "https://graphql.anilist.co";
 
-  Future<List<SearchCard>> fetchSearchCards(String search, String type, {int pageNumber = 1}) async {
+  Future<List<MediaEntry>> fetchSearchCards(String search, String type, {int pageNumber = 1}) async {
     final searchQuery = """
     query (\$search: String!) {
       Page {
@@ -105,7 +108,7 @@ mixin SearchQueryHandler {
         body: jsonBody
     );
 
-    List<SearchCard> searchResults = [];
+    List<MediaEntry> searchResults = [];
 
     if(response.statusCode == 200){
 
@@ -115,21 +118,8 @@ mixin SearchQueryHandler {
       final media = responseBody["data"]["Page"]["media"];
 
       for(final element in media){
-
-        dynamic english = element["title"]["english"];
-        dynamic native = element["title"]["native"];
-        dynamic romaji = element["title"]["romaji"];
-        dynamic image = element["coverImage"]["medium"];
-
-        final card = SearchCard(
-           nameEnglish: english ?? "",
-           nameNative: native ?? "",
-           nameRomaji: romaji ?? "",
-           coverImageURL: image ?? "",
-        );
-
-        searchResults.add(card);
-
+        final entry = MediaEntry.fromMap(element);
+        searchResults.add(entry);
       }
 
     }
@@ -137,7 +127,7 @@ mixin SearchQueryHandler {
     return searchResults;
   }
 
-  Future<List<SearchCard>> fetchTrending(String type, {int pageNumber = 1}) async {
+  Future<List<MediaEntry>> fetchTrending(String type, {int pageNumber = 1}) async {
     final searchQuery = """
     query {
       Page {
@@ -167,7 +157,7 @@ mixin SearchQueryHandler {
         body: jsonBody
     );
 
-    List<SearchCard> searchResults = [];
+    List<MediaEntry> searchResults = [];
 
     if(response.statusCode == 200){
 
@@ -177,21 +167,8 @@ mixin SearchQueryHandler {
       final media = responseBody["data"]["Page"]["media"];
 
       for(final element in media){
-
-        dynamic english = element["title"]["english"];
-        dynamic native = element["title"]["native"];
-        dynamic romaji = element["title"]["romaji"];
-        dynamic image = element["coverImage"]["medium"];
-
-        final card = SearchCard(
-          nameEnglish: english ?? "",
-          nameNative: native ?? "",
-          nameRomaji: romaji ?? "",
-          coverImageURL: image ?? "",
-        );
-
-        searchResults.add(card);
-
+        final entry = MediaEntry.fromMap(element);
+        searchResults.add(entry);
       }
 
     }
@@ -199,7 +176,7 @@ mixin SearchQueryHandler {
     return searchResults;
   }
 
-  Future<List<SearchCard>> fetchTop(String type, {int pageNumber = 1}) async {
+  Future<List<MediaEntry>> fetchTop(String type, {int pageNumber = 1}) async {
     final searchQuery = """
     query {
       Page {
@@ -229,7 +206,7 @@ mixin SearchQueryHandler {
         body: jsonBody
     );
 
-    List<SearchCard> searchResults = [];
+    List<MediaEntry> searchResults = [];
 
     if(response.statusCode == 200){
 
@@ -239,21 +216,8 @@ mixin SearchQueryHandler {
       final media = responseBody["data"]["Page"]["media"];
 
       for(final element in media){
-
-        dynamic english = element["title"]["english"];
-        dynamic native = element["title"]["native"];
-        dynamic romaji = element["title"]["romaji"];
-        dynamic image = element["coverImage"]["medium"];
-
-        final card = SearchCard(
-          nameEnglish: english ?? "",
-          nameNative: native ?? "",
-          nameRomaji: romaji ?? "",
-          coverImageURL: image ?? "",
-        );
-
-        searchResults.add(card);
-
+        final entry = MediaEntry.fromMap(element);
+        searchResults.add(entry);
       }
 
     }

@@ -1,3 +1,4 @@
+import 'package:anarchist/types/anilist_data.dart';
 import 'package:anarchist/util/search_query.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -92,14 +93,18 @@ class _SearchPageState extends State<SearchPage> with SearchQueryHandler{
             controller.closeView(controller.text);
           });
         },
+        onSubmitted: (searchString) {
+
+        },
       );
-    }, suggestionsBuilder: (context, controller) {
-      return fetchSearchResults(controller); //Maybe store past searches and grab them here?
+    }, suggestionsBuilder: (context, controller) async {
+      List<MediaEntry> data = await fetchSearchResults(controller);
+      return List.generate(data.length, (index) => SearchCard(entry: data[index])); //Maybe store past searches and grab them here?
     });
   }
 
-  Future<List<SearchCard>> fetchSearchResults(SearchController controller) async {
-    final data = await fetchTrending(type.name);
+  Future<List<MediaEntry>> fetchSearchResults(SearchController controller) async {
+    final data = await fetchSearchCards(controller.text, type.name);
     return data;
   }
 }
