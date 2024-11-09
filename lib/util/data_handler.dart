@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:anarchist/types/anarchist_data.dart';
+import 'package:anarchist/types/anilist_data.dart';
+import 'package:anarchist/util/search_query.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DataSchema {
@@ -22,10 +24,19 @@ class DataSchema {
   }
 }
 
-class DataHandler {
+class DataHandler with AuthorizedQueryHandler {
+  static final DataHandler _instance = DataHandler._internal();
   static const String dataFilename = 'data.json';
 
-  AnarchistData currentData = AnarchistData();
+  UserIdentity? _identity;
+
+  UserIdentity? get identity => _identity;
+
+  DataHandler._internal();
+
+  factory DataHandler() {
+    return _instance;
+  }
 
   Future<AnarchistData> readData() async {
     File f = File(
@@ -35,7 +46,13 @@ class DataHandler {
       return AnarchistData();
     }
 
-    return AnarchistData.fromJson(jsonDecode(await f.readAsString()));
+    AnarchistData data = AnarchistData.fromJson(jsonDecode(await f.readAsString()));
+
+    if (data.accessToken != null) {
+      _identity = await getUserIdentity(data.accessToken!);
+    }
+
+    return data;
   }
 
   void writeData(AnarchistData data) async {

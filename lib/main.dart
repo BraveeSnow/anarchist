@@ -9,6 +9,7 @@ import 'package:anarchist/types/anarchist_data.dart';
 import 'package:anarchist/types/oauth_response.dart';
 import 'package:anarchist/util/data_handler.dart';
 import 'package:anarchist/util/oauth_handler.dart';
+import 'package:anarchist/util/search_query.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -130,8 +131,8 @@ class _AnarchistMainPageState extends State<AnarchistMainPage> {
         child: const [
           HomePage(),
           SearchPage(),
-          ListPage(mediaType: ListType.anime),
-          ListPage(mediaType: ListType.manga),
+          ListPage(mediaType: MediaType.anime),
+          ListPage(mediaType: MediaType.manga),
           AccountPage(),
         ][currentPage],
       ),
