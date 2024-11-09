@@ -29,9 +29,8 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
             if (snapshot.data == null) {
               return null;
             }
-
-            return Column(
-                children: snapshot.data!.map(renderUserList).toList());
+            log(snapshot.data!.length.toString());
+            return renderUserList(snapshot.data![index]);
           },
         );
       },
