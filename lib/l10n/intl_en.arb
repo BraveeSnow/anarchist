@@ -1,6 +1,9 @@
 {
   "@@locale": "en",
 
+  "dialogCancel": "Cancel",
+  "dialogConfirm": "Confirm",
+
   "navbarHome": "Home",
   "navbarSearch": "Search",
   "navbarAnime": "Anime",
@@ -15,6 +18,8 @@
   "listDropped": "Dropped",
   "listPaused": "Paused",
   "listRepeating": "Re-watching",
+  "listChangeListTitle": "Move to Another List",
+  "listChangeListDialog": "Select the new list for the entry to be added into:",
   "loginSkip": "Skip",
   "loginConnect": "Connect with AniList",
   "loginSkipDialogTitle": "Skip Login?",

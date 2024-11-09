@@ -48,18 +48,27 @@ enum MediaListStatus {
         "REPEATING" => MediaListStatus.repeating,
         String() => throw Exception("invalid media list status"),
       };
+
+  @override
+  String toString() => name.toUpperCase();
+
+  String toJson() {
+    return toString();
+  }
 }
 
 /// The entry containing all of the relevant information related to the user
 /// and a [MediaEntry].
 class UserMediaEntry {
-  late final int score; // do not display ratings of 0
-  late final MediaListStatus status;
-  late final int progress;
-  late final MediaEntry mediaEntry;
+  final int id;
+  final int score; // do not display ratings of 0
+  final MediaListStatus status;
+  final int progress;
+  final MediaEntry mediaEntry;
 
   UserMediaEntry.fromMap(Map<String, dynamic> data)
-      : score = data['score'],
+      : id = data['id'],
+        score = data['score'],
         status = MediaListStatus.from(data['status']),
         progress = data['progress'],
         mediaEntry = MediaEntry.fromMap(data['media']);

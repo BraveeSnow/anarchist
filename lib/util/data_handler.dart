@@ -28,9 +28,7 @@ class DataHandler with AuthorizedQueryHandler {
   static final DataHandler _instance = DataHandler._internal();
   static const String dataFilename = 'data.json';
 
-  UserIdentity? _identity;
-
-  UserIdentity? get identity => _identity;
+  UserIdentity? identity;
 
   DataHandler._internal();
 
@@ -49,7 +47,7 @@ class DataHandler with AuthorizedQueryHandler {
     AnarchistData data = AnarchistData.fromJson(jsonDecode(await f.readAsString()));
 
     if (data.accessToken != null) {
-      _identity = await getUserIdentity(data.accessToken!);
+      identity = await getUserIdentity(data.accessToken!);
     }
 
     return data;

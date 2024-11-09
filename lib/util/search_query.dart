@@ -242,6 +242,7 @@ mixin AuthorizedQueryHandler {
         		lists {
               name
               entries {
+                id
                 score
                 status
                 progress
@@ -264,14 +265,36 @@ mixin AuthorizedQueryHandler {
         }
   ''';
 
-  Future<UserIdentity?> getUserIdentity(String token) async {
-    http.Response res = await http.post(
-      _baseAPIURL,
-      body: { 'query': _getUserIdentityQuery },
-      headers: {
-        'Authorization': 'Bearer $token',
+  static const String _mutateMediaEntry = r'''
+    mutation ($id: Int!, $status: MediaListStatus) {
+      SaveMediaListEntry(id: $id, status: $status) {
+        id
+        score
+        status
+        progress
+        media {
+          id
+          title {
+            english
+            romaji
+            native
+          }
+          coverImage {
+            color
+            medium
+          }
+          episodes
+        }
       }
-    );
+    }
+  ''';
+
+  Future<UserIdentity?> getUserIdentity(String token) async {
+    http.Response res = await http.post(_baseAPIURL, body: {
+      'query': _getUserIdentityQuery
+    }, headers: {
+      'Authorization': 'Bearer $token',
+    });
 
     if (res.statusCode != 200) {
       log("Received error ${res.statusCode}:\n${res.body}");
@@ -320,5 +343,45 @@ mixin AuthorizedQueryHandler {
     }
 
     return watchlists;
+  }
+
+  /// Updates a [UserMediaEntry] through the GraphQL API.
+  ///
+  /// Returns: the newly updated entry details to replace the old entry.
+  Future<UserMediaEntry?> mutateUserMediaEntry(
+      int mediaId, MediaListStatus status) async {
+    String? token = await _getAccessToken();
+    http.Response res = await http.post(
+      _baseAPIURL,
+      body: jsonEncode({
+        'query': _mutateMediaEntry,
+        'variables': {'id': mediaId, 'status': status}
+      }),
+      headers: {
+        'authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
+    );
+
+    if (res.statusCode != 200) {
+      log(res.body);
+      return null;
+    }
+
+    dynamic decoded = jsonDecode(res.body);
+    if (decoded is! Map) {
+      log('Received data was not JSON encoded');
+      return null;
+    }
+
+    return UserMediaEntry.fromMap(decoded['data']['SaveMediaListEntry']);
+  }
+
+  Future<String> _getAccessToken() async {
+    String? token = (await DataHandler().readData()).accessToken;
+    if (token == null) {
+      throw Exception("no token exists");
+    }
+    return token;
   }
 }
