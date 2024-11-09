@@ -239,25 +239,29 @@ mixin AuthorizedQueryHandler {
   static const String _getUserListsQuery = r'''
     query ($userId: Int!, $type: MediaType!) {
       MediaListCollection(userId: $userId, type: $type) {
-        lists {
-          name
-          entries {
-            media {
-              id
-              title {
-                english
-                romaji
-                native
-              }
-              coverImage {
-                color
-                medium
+        		lists {
+              name
+              entries {
+                score
+                status
+                progress
+                media {
+                  id
+                  title {
+                    english
+                    romaji
+                    native
+                  }
+                  coverImage {
+                    color
+                    medium
+                  }
+                  episodes
+                }
               }
             }
           }
         }
-      }
-    }
   ''';
 
   Future<UserIdentity?> getUserIdentity(String token) async {
@@ -270,6 +274,7 @@ mixin AuthorizedQueryHandler {
     );
 
     if (res.statusCode != 200) {
+      log("Received error ${res.statusCode}:\n${res.body}");
       return null;
     }
 
@@ -298,12 +303,13 @@ mixin AuthorizedQueryHandler {
     );
 
     if (res.statusCode != 200) {
-      log(res.body);
+      log("Received error ${res.statusCode}:\n${res.body}");
       return null;
     }
 
     dynamic decoded = jsonDecode(res.body);
     if (decoded is! Map) {
+      log('Received data was not JSON encoded');
       return null;
     }
 

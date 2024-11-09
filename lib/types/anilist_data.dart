@@ -11,6 +11,7 @@ class MediaEntry {
   String? nativeName;
   String? romajiName;
   String? coverImageURL;
+  int? episodes;
 
   MediaEntry.fromMap(Map<String, dynamic> media) {
     id = media["id"];
@@ -24,12 +25,49 @@ class MediaEntry {
     if (media.containsKey("coverImage")) {
       coverImageURL = media["coverImage"]["medium"] ?? "";
     }
+
+    episodes = media['episodes'];
   }
+}
+
+/// The status of a media entry as according to the user.
+enum MediaListStatus {
+  current,
+  planning,
+  completed,
+  dropped,
+  paused,
+  repeating;
+
+  factory MediaListStatus.from(String raw) => switch (raw) {
+        "CURRENT" => MediaListStatus.current,
+        "PLANNING" => MediaListStatus.planning,
+        "COMPLETED" => MediaListStatus.completed,
+        "DROPPED" => MediaListStatus.dropped,
+        "PAUSED" => MediaListStatus.paused,
+        "REPEATING" => MediaListStatus.repeating,
+        String() => throw Exception("invalid media list status"),
+      };
+}
+
+/// The entry containing all of the relevant information related to the user
+/// and a [MediaEntry].
+class UserMediaEntry {
+  late final int score; // do not display ratings of 0
+  late final MediaListStatus status;
+  late final int progress;
+  late final MediaEntry mediaEntry;
+
+  UserMediaEntry.fromMap(Map<String, dynamic> data)
+      : score = data['score'],
+        status = MediaListStatus.from(data['status']),
+        progress = data['progress'],
+        mediaEntry = MediaEntry.fromMap(data['media']);
 }
 
 class UserWatchlist {
   final String name;
-  final List<MediaEntry> entries = [];
+  final List<UserMediaEntry> entries = [];
 
   UserWatchlist.fromMap(Map<String, dynamic> data) : name = data['name'] {
     if (data['entries'] is! List) {
@@ -37,11 +75,15 @@ class UserWatchlist {
     }
 
     for (var map in data['entries']) {
-      entries.add(MediaEntry.fromMap(map['media']));
+      entries.add(UserMediaEntry.fromMap(map));
     }
   }
 }
 
+/// The rating scheme that the user prefers.
+///
+/// This should be used to determine how the user's ratings should be
+/// displayed in their lists, as well as how they rate something.
 enum UserRatingScheme {
   point100, // out of 100
   point10Decimal, // out of 10, decimals included
