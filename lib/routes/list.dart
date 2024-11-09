@@ -1,9 +1,8 @@
-import 'dart:developer';
-
 import 'package:anarchist/util/search_query.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../types/anilist_data.dart';
+import '../util/data_handler.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key, required this.mediaType});
@@ -23,14 +22,31 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
     return FutureBuilder(
       future: _userWatchlists,
       builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        Map<String, UserWatchlist> mappedUserLists = {};
+        for (final watchlist in snapshot.data!) {
+          mappedUserLists[watchlist.name] = watchlist;
+        }
+
+        UserIdentity? identity = DataHandler().identity;
         return ListView.builder(
-          itemCount: snapshot.data?.length ?? 0,
+          itemCount: identity?.animeSectionOrder.length ?? 0,
           itemBuilder: (context, index) {
-            if (snapshot.data == null) {
-              return null;
+            // TODO: this may not be the best way to go about things
+            // some lists are defined in user identity but not guaranteed in
+            // fetching user lists
+            if (snapshot.data == null ||
+                !mappedUserLists.keys
+                    .contains(identity!.animeSectionOrder[index])) {
+              return Container();
             }
-            log(snapshot.data!.length.toString());
-            return renderUserList(snapshot.data![index]);
+            return renderUserList(
+                mappedUserLists[identity.animeSectionOrder[index]]!);
           },
         );
       },
@@ -38,7 +54,6 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
   }
 
   Widget renderUserList(UserWatchlist watchlist) {
-    log(watchlist.entries.length.toString());
     return Column(
       children: [
         Text(watchlist.name, style: const TextStyle(fontSize: 24)),

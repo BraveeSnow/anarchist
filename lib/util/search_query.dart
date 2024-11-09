@@ -224,6 +224,14 @@ mixin AuthorizedQueryHandler {
     query {
       Viewer {
         id
+        name
+        mediaListOptions {
+          scoreFormat
+          rowOrder
+          animeList {
+            sectionOrder
+          }
+        }
       }
     }
   ''';
