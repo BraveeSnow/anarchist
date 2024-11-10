@@ -128,12 +128,12 @@ class _AnarchistMainPageState extends State<AnarchistMainPage> {
     return Scaffold(
       bottomNavigationBar: mainNavigationBar(),
       body: SafeArea(
-        child: const [
-          HomePage(),
-          SearchPage(),
-          ListPage(mediaType: MediaType.anime),
-          ListPage(mediaType: MediaType.manga),
-          AccountPage(),
+        child: [
+          const HomePage(),
+          const SearchPage(),
+          ListPage(key: UniqueKey(), mediaType: MediaType.anime),
+          ListPage(key: UniqueKey(), mediaType: MediaType.manga),
+          const AccountPage(),
         ][currentPage],
       ),
     );

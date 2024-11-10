@@ -311,6 +311,7 @@ mixin AuthorizedQueryHandler {
   }
 
   Future<List<UserWatchlist>?> fetchUserLists(MediaType type) async {
+    log('test');
     int? userId = DataHandler().identity?.id;
     if (userId == null) {
       return null;
@@ -325,15 +326,18 @@ mixin AuthorizedQueryHandler {
       headers: {'Content-Type': 'application/json'},
     );
 
-    if (res.statusCode != 200) {
-      log("Received error ${res.statusCode}:\n${res.body}");
-      return null;
-    }
 
     dynamic decoded = jsonDecode(res.body);
     if (decoded is! Map) {
-      log('Received data was not JSON encoded');
-      return null;
+      throw http.ClientException('Server response was malformed.');
+    }
+
+    if (res.statusCode != 200) {
+      List<dynamic> errors = decoded['errors'];
+      if (errors.isEmpty || errors[0] is! Map) {
+        throw http.ClientException('Unknown');
+      }
+      throw http.ClientException(errors[0]['message']);
     }
 
     dynamic rawData = decoded['data']['MediaListCollection']['lists'];

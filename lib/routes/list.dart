@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:anarchist/util/search_query.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catppuccin_flutter/catppuccin_flutter.dart';
@@ -28,6 +26,20 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
     return StreamBuilder(
       stream: _userWatchlists.asStream(),
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Icon(Icons.warning),
+                ),
+                Text(snapshot.error.toString(), textAlign: TextAlign.center),
+              ],
+            ),
+          );
+        }
         if (!snapshot.hasData) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -83,6 +95,7 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
 
 class UserMediaEntryCard extends StatelessWidget {
   static const double _cardSize = 150;
+
   final UserMediaEntry userEntry;
   final Function(int, MediaListStatus) entryUpdateCallback;
 

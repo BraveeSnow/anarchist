@@ -1,6 +1,4 @@
 //ToDo: Actually use this
-import 'dart:developer';
-
 class MediaEntry {
   late int id;
 
