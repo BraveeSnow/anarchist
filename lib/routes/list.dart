@@ -85,8 +85,8 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
     );
   }
 
-  void updateEntryCallback(int mediaId, MediaListStatus status) {
-    mutateUserMediaEntry(mediaId, status);
+  void updateEntryCallback(int mediaId, MediaListStatus status) async {
+    await mutateUserMediaEntry(mediaId, status);
     setState(() {
       _userWatchlists = fetchUserLists(widget.mediaType);
     });
