@@ -250,6 +250,7 @@ mixin AuthorizedQueryHandler {
                 score
                 status
                 progress
+                updatedAt
                 media {
                   id
                   title {
@@ -276,6 +277,7 @@ mixin AuthorizedQueryHandler {
         score
         status
         progress
+        updatedAt
         media {
           id
           title {

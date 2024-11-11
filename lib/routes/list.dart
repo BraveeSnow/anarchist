@@ -28,18 +28,7 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
       stream: _userWatchlists.asStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(paddingScreenEdge),
-                  child: Icon(Icons.warning),
-                ),
-                Text(snapshot.error.toString(), textAlign: TextAlign.center),
-              ],
-            ),
-          );
+          errorScreen(snapshot.error);
         }
         if (!snapshot.hasData) {
           return const Center(
@@ -49,6 +38,8 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
 
         Map<String, UserWatchlist> mappedUserLists = {};
         for (final watchlist in snapshot.data!) {
+          watchlist.entries.sort(
+              DataHandler().identity?.rowOrder.getSortFunction());
           mappedUserLists[watchlist.name] = watchlist;
         }
 
@@ -78,11 +69,27 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
       children: [
         Padding(
           padding: const EdgeInsets.all(paddingWidgetSpacer),
-          child: Text(watchlist.name, style: const TextStyle(fontSize: fontSizeSecondaryTitle)),
+          child: Text(watchlist.name,
+              style: const TextStyle(fontSize: fontSizeSecondaryTitle)),
         ),
         ...watchlist.entries.map((e) => UserMediaEntryCard(
             userEntry: e, entryUpdateCallback: updateEntryCallback)),
       ],
+    );
+  }
+
+  Widget errorScreen(Object? error) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(paddingScreenEdge),
+            child: Icon(Icons.warning),
+          ),
+          Text(error.toString(), textAlign: TextAlign.center),
+        ],
+      ),
     );
   }
 

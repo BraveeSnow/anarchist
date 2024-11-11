@@ -65,6 +65,7 @@ class UserMediaEntry {
   final int score; // do not display ratings of 0
   final MediaListStatus status;
   final int progress;
+  final int lastUpdated;
   final MediaEntry mediaEntry;
 
   UserMediaEntry.fromMap(Map<String, dynamic> data)
@@ -72,6 +73,7 @@ class UserMediaEntry {
         score = data['score'],
         status = MediaListStatus.from(data['status']),
         progress = data['progress'],
+        lastUpdated = data['updatedAt'],
         mediaEntry = MediaEntry.fromMap(data['media']);
 }
 
@@ -111,11 +113,47 @@ enum UserRatingScheme {
       };
 }
 
+enum UserRowOrder {
+  score,
+  title,
+  lastUpdated,
+  lastAdded; // sorted using user entry id
+
+  factory UserRowOrder.from(String raw) => switch (raw) {
+        'score' => UserRowOrder.score,
+        'title' => UserRowOrder.title,
+        'updatedAt' => UserRowOrder.lastUpdated,
+        'id' => UserRowOrder.lastAdded,
+        String() => throw ArgumentError('Invalid row order string "$raw"'),
+      };
+
+  int Function(UserMediaEntry, UserMediaEntry) getSortFunction() =>
+      switch (this) {
+        // not fully perfect with symbols, as seen with entries like FSN UBW
+        // and FSN Heaven's Feel
+        UserRowOrder.title => (e1, e2) => _titleSort(e1, e2),
+        UserRowOrder.score => (e1, e2) {
+            if (e1.score == e2.score) {
+              return _titleSort(e1, e2);
+            }
+            // replicate behavior on platform: highest rated first
+            return e2.score.compareTo(e1.score);
+          },
+        UserRowOrder.lastUpdated => (e1, e2) =>
+            e2.lastUpdated.compareTo(e1.lastUpdated),
+        UserRowOrder.lastAdded => (e1, e2) => e2.id.compareTo(e1.id),
+      };
+
+  int _titleSort(UserMediaEntry e1, UserMediaEntry e2) =>
+      (e1.mediaEntry.englishName?.toLowerCase() ?? '')
+          .compareTo(e2.mediaEntry.englishName?.toLowerCase() ?? '');
+}
+
 class UserIdentity {
   final int id;
   final String name;
   final UserRatingScheme ratingScheme;
-  final String rowOrder;
+  final UserRowOrder rowOrder;
   final List<String> animeSectionOrder = [];
 
   UserIdentity.fromMap(Map<String, dynamic> data)
@@ -123,7 +161,7 @@ class UserIdentity {
         name = data['name'],
         ratingScheme =
             UserRatingScheme.from(data['mediaListOptions']['scoreFormat']),
-        rowOrder = data['mediaListOptions']['rowOrder'] {
+        rowOrder = UserRowOrder.from(data['mediaListOptions']['rowOrder']) {
     for (String section in data['mediaListOptions']['animeList']
         ['sectionOrder']) {
       animeSectionOrder.add(section);
