@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:anarchist/types/anilist_data.dart';
 import 'package:flutter/material.dart';
@@ -294,29 +293,20 @@ mixin AuthorizedQueryHandler {
     }
   ''';
 
-  Future<UserIdentity?> getUserIdentity(String token) async {
+  Future<UserIdentity> getUserIdentity(String token) async {
     http.Response res = await http.post(_baseAPIURL, body: {
       'query': _getUserIdentityQuery
     }, headers: {
       'Authorization': 'Bearer $token',
     });
 
-    if (res.statusCode != 200) {
-      log("Received error ${res.statusCode}:\n${res.body}");
-      return null;
-    }
+    Map<String, dynamic> parsed = _parseResponse(res);
 
-    dynamic decoded = jsonDecode(res.body);
-    if (decoded is! Map) {
-      return null;
-    }
-
-    dynamic rawData = decoded['data']['Viewer'];
+    dynamic rawData = parsed['data']['Viewer'];
     return UserIdentity.fromMap(rawData);
   }
 
-  Future<List<UserWatchlist>?> fetchUserLists(MediaType type) async {
-    log('test');
+  Future<List<UserWatchlist>> fetchUserLists(MediaType type) async {
     int? userId = DataHandler().identity?.id;
     if (userId == null) {
       throw http.ClientException('Sign in to see this content.');
@@ -332,20 +322,8 @@ mixin AuthorizedQueryHandler {
     );
 
 
-    dynamic decoded = jsonDecode(res.body);
-    if (decoded is! Map) {
-      throw http.ClientException('Server response was malformed.');
-    }
-
-    if (res.statusCode != 200) {
-      List<dynamic> errors = decoded['errors'];
-      if (errors.isEmpty || errors[0] is! Map) {
-        throw http.ClientException('Unknown');
-      }
-      throw http.ClientException(errors[0]['message']);
-    }
-
-    dynamic rawData = decoded['data']['MediaListCollection']['lists'];
+    Map<String, dynamic> parsed = _parseResponse(res);
+    dynamic rawData = parsed['data']['MediaListCollection']['lists'];
     List<UserWatchlist> watchlists = [];
     for (var map in rawData) {
       watchlists.add(UserWatchlist.fromMap(map));
@@ -357,7 +335,7 @@ mixin AuthorizedQueryHandler {
   /// Updates a [UserMediaEntry] through the GraphQL API.
   ///
   /// Returns: the newly updated entry details to replace the old entry.
-  Future<UserMediaEntry?> mutateUserMediaEntry(
+  Future<UserMediaEntry> mutateUserMediaEntry(
       int mediaId, MediaListStatus status) async {
     String? token = await _getAccessToken();
     http.Response res = await http.post(
@@ -372,18 +350,8 @@ mixin AuthorizedQueryHandler {
       },
     );
 
-    if (res.statusCode != 200) {
-      log(res.body);
-      return null;
-    }
-
-    dynamic decoded = jsonDecode(res.body);
-    if (decoded is! Map) {
-      log('Received data was not JSON encoded');
-      return null;
-    }
-
-    return UserMediaEntry.fromMap(decoded['data']['SaveMediaListEntry']);
+    Map<String, dynamic> parsed = _parseResponse(res);
+    return UserMediaEntry.fromMap(parsed['data']['SaveMediaListEntry']);
   }
 
   Future<String> _getAccessToken() async {
@@ -392,5 +360,22 @@ mixin AuthorizedQueryHandler {
       throw Exception("no token exists");
     }
     return token;
+  }
+
+  Map<String, dynamic> _parseResponse(http.Response res) {
+    dynamic decoded = jsonDecode(res.body);
+    if (decoded is! Map<String, dynamic>) {
+      throw http.ClientException('Server response was malformed.');
+    }
+
+    if (res.statusCode != 200) {
+      List<dynamic> errors = decoded['errors'];
+      if (errors.isEmpty || errors[0] is! Map) {
+        throw http.ClientException('Unknown');
+      }
+      throw http.ClientException(errors[0]['message']);
+    }
+
+    return decoded;
   }
 }
