@@ -1,3 +1,4 @@
+import 'package:anarchist/routes/media_details.dart';
 import 'package:anarchist/util/constants.dart';
 import 'package:anarchist/util/search_query.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -38,8 +39,8 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
 
         Map<String, UserWatchlist> mappedUserLists = {};
         for (final watchlist in snapshot.data!) {
-          watchlist.entries.sort(
-              DataHandler().identity?.rowOrder.getSortFunction());
+          watchlist.entries
+              .sort(DataHandler().identity?.rowOrder.getSortFunction());
           mappedUserLists[watchlist.name] = watchlist;
         }
 
@@ -115,28 +116,34 @@ class UserMediaEntryCard extends StatelessWidget {
     return ConstrainedBox(
       constraints:
           const BoxConstraints(minHeight: _cardSize, maxHeight: _cardSize),
-      child: Card.outlined(
-        clipBehavior: Clip.hardEdge,
-        child: Row(
-          children: [
-            CachedNetworkImage(
-              imageUrl: userEntry.mediaEntry.coverImageURL!,
-              fit: BoxFit.fitHeight,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(paddingScreenEdge),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _titleLabels(context),
-                    _statusRow(context),
-                  ],
+      child: GestureDetector(
+        onTap: () {
+          context.pushNamed(MediaDetailsPage.route,
+              pathParameters: {'id': userEntry.mediaEntry.id.toString()});
+        },
+        child: Card.outlined(
+          clipBehavior: Clip.hardEdge,
+          child: Row(
+            children: [
+              CachedNetworkImage(
+                imageUrl: userEntry.mediaEntry.coverImageURL!,
+                fit: BoxFit.fitHeight,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(paddingScreenEdge),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _titleLabels(context),
+                      _statusRow(context),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -147,9 +154,7 @@ class UserMediaEntryCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          userEntry.mediaEntry.englishName!.isNotEmpty
-              ? userEntry.mediaEntry.englishName!
-              : userEntry.mediaEntry.romajiName!,
+          userEntry.mediaEntry.preferredName!,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),

@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> with SearchQueryHandler {
 
 
                 return TrendingCard(
-                    title: snapshot.data![index].englishName!,
+                    title: snapshot.data![index].preferredName!,
                     imageUri: snapshot.data![index].coverImageURLHD!);
               },
             );

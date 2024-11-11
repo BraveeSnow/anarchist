@@ -9,18 +9,16 @@ import 'data_handler.dart';
 final Uri _baseAPIURL = Uri.parse("https://graphql.anilist.co");
 
 class SearchCard extends StatelessWidget {
+  late final String namePreferred;
   late final String nameNative;
-  late final String nameEnglish;
-  late final String nameRomaji;
   late final String coverImageURL;
   late final String coverImageURLHD;
 
   final MediaEntry entry;
 
   SearchCard({super.key, required this.entry}) {
+    namePreferred = entry.preferredName!;
     nameNative = entry.nativeName!;
-    nameEnglish = entry.englishName!;
-    nameRomaji = entry.romajiName!;
     coverImageURL = entry.coverImageURL!;
     coverImageURLHD = entry.coverImageURLHD!;
   }
@@ -48,7 +46,7 @@ class SearchCard extends StatelessWidget {
                 SizedBox(
                     width: cWidth,
                     child: Text(
-                        nameEnglish.isNotEmpty ? nameEnglish : nameRomaji,
+                        namePreferred,
                         style: const TextStyle(
                             fontSize: 14, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.left)),
@@ -72,6 +70,12 @@ enum MediaType {
   anime,
   manga;
 
+  factory MediaType.from(String raw) => switch (raw) {
+        "ANIME" => MediaType.anime,
+        "MANGA" => MediaType.manga,
+        String() => throw ArgumentError('invalid media type string "$raw"'),
+      };
+
   String get graphQLString => switch (this) {
         MediaType.anime => "ANIME",
         MediaType.manga => "MANGA",
@@ -79,6 +83,61 @@ enum MediaType {
 }
 
 mixin SearchQueryHandler {
+  static const String _getMediaDetailsQuery = r'''
+  query($id: Int!) {
+    Media(id: $id) {
+      title {
+        userPreferred
+        native
+      }
+      type
+      format
+      status
+      description
+      startDate {
+        day
+        month
+        year
+      }
+      endDate {
+        day
+        month
+        year
+      }
+      seasonYear
+    seasonInt
+      episodes
+      duration
+      chapters
+      volumes
+      trailer {
+        id
+        site
+      }
+      coverImage {
+        extraLarge
+      }
+      bannerImage
+      genres
+      averageScore
+      meanScore
+      popularity
+      favourites
+      isFavourite
+      stats {
+        scoreDistribution {
+          amount
+          score
+        }
+        statusDistribution {
+          amount
+          status
+        }
+      }
+    }
+  }
+  ''';
+
   Future<List<MediaEntry>> fetchSearchCards(String search, String type,
       {int pageNumber = 1}) async {
     final searchQuery = """
@@ -87,9 +146,8 @@ mixin SearchQueryHandler {
         media(search: \$search, type: ${type.toUpperCase()}) {
           id
           title {
-            english
+            userPreferred
             native
-            romaji
           }
           coverImage {
             color
@@ -130,6 +188,26 @@ mixin SearchQueryHandler {
     return searchResults;
   }
 
+  Future<DetailedMediaEntry> fetchMediaDetails(int id) async {
+    // this is optional; user does not need to be signed in for this to work
+    String? token = (await DataHandler().readData()).accessToken;
+
+    http.Response res = await http.post(
+      _baseAPIURL,
+      body: jsonEncode({
+        'query': _getMediaDetailsQuery,
+        'variables': {'id': id},
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    Map<String, dynamic> parsed = _parseResponse(res);
+    return DetailedMediaEntry.fromMap(parsed);
+  }
+
   Future<List<MediaEntry>> fetchTrending(String type,
       {int pageNumber = 1}) async {
     final searchQuery = """
@@ -138,9 +216,8 @@ mixin SearchQueryHandler {
         media(type: ${type.toUpperCase()}, sort: TRENDING_DESC) {
           id
           title {
-            english
+            userPreferred
             native
-            romaji
           }
           coverImage {
             color
@@ -183,9 +260,8 @@ mixin SearchQueryHandler {
         media(type: ${type.toUpperCase()}, sort: SCORE_DESC) {
           id
           title {
-            english
+            userPreferred
             native
-            romaji
           }
           coverImage {
             color
@@ -216,10 +292,26 @@ mixin SearchQueryHandler {
         final entry = MediaEntry.fromMap(element);
         searchResults.add(entry);
       }
-
     }
 
     return searchResults;
+  }
+
+  Map<String, dynamic> _parseResponse(http.Response res) {
+    dynamic decoded = jsonDecode(res.body);
+    if (decoded is! Map<String, dynamic>) {
+      throw http.ClientException('Server response was malformed.');
+    }
+
+    if (res.statusCode != 200) {
+      List<dynamic> errors = decoded['errors'];
+      if (errors.isEmpty || errors[0] is! Map) {
+        throw http.ClientException('Unknown');
+      }
+      throw http.ClientException(errors[0]['message']);
+    }
+
+    return decoded;
   }
 }
 
@@ -254,8 +346,7 @@ mixin AuthorizedQueryHandler {
                 media {
                   id
                   title {
-                    english
-                    romaji
+                    userPreferred
                     native
                   }
                   coverImage {
@@ -281,8 +372,7 @@ mixin AuthorizedQueryHandler {
         media {
           id
           title {
-            english
-            romaji
+            userPreferred
             native
           }
           coverImage {
@@ -322,7 +412,6 @@ mixin AuthorizedQueryHandler {
       }),
       headers: {'Content-Type': 'application/json'},
     );
-
 
     Map<String, dynamic> parsed = _parseResponse(res);
     dynamic rawData = parsed['data']['MediaListCollection']['lists'];

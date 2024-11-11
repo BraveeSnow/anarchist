@@ -6,6 +6,7 @@ import 'package:anarchist/login.dart';
 import 'package:anarchist/routes/account.dart';
 import 'package:anarchist/routes/home.dart';
 import 'package:anarchist/routes/list.dart';
+import 'package:anarchist/routes/media_details.dart';
 import 'package:anarchist/routes/search.dart';
 import 'package:anarchist/types/anarchist_data.dart';
 import 'package:anarchist/types/oauth_response.dart';
@@ -67,6 +68,10 @@ class _AnarchistState extends State<Anarchist> {
           ),
         ],
       ),
+      GoRoute(
+          path: MediaDetailsPage.route,
+          builder: (context, state) => MediaDetailsPage(
+              mediaId: int.parse(state.pathParameters['id']!))),
     ],
   );
 
