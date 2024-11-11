@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:anarchist/types/anilist_data.dart';
 import 'package:flutter/material.dart';
