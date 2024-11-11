@@ -320,7 +320,7 @@ mixin AuthorizedQueryHandler {
     log('test');
     int? userId = DataHandler().identity?.id;
     if (userId == null) {
-      return null;
+      throw http.ClientException('Sign in to see this content.');
     }
 
     http.Response res = await http.post(
