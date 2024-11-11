@@ -14,6 +14,7 @@ class SearchCard extends StatelessWidget {
   late String nameEnglish;
   late String nameRomaji;
   late String coverImageURL;
+  late String coverImageURLHD;
 
   final MediaEntry entry;
 
@@ -22,6 +23,7 @@ class SearchCard extends StatelessWidget {
     nameEnglish = entry.englishName!;
     nameRomaji = entry.romajiName!;
     coverImageURL = entry.coverImageURL!;
+    coverImageURLHD = entry.coverImageURLHD!;
   }
 
   @override
@@ -94,6 +96,7 @@ mixin SearchQueryHandler {
           coverImage {
             color
             medium
+            extraLarge
           }
         }
       }
@@ -144,6 +147,7 @@ mixin SearchQueryHandler {
           coverImage {
             color
             medium
+            extraLarge
           }
         }
       }
@@ -188,6 +192,7 @@ mixin SearchQueryHandler {
           coverImage {
             color
             medium
+            extraLarge
           }
         }
       }
@@ -213,6 +218,7 @@ mixin SearchQueryHandler {
         final entry = MediaEntry.fromMap(element);
         searchResults.add(entry);
       }
+
     }
 
     return searchResults;
@@ -314,7 +320,7 @@ mixin AuthorizedQueryHandler {
     log('test');
     int? userId = DataHandler().identity?.id;
     if (userId == null) {
-      return null;
+      throw http.ClientException('Sign in to see this content.');
     }
 
     http.Response res = await http.post(

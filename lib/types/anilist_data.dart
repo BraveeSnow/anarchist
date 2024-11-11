@@ -9,6 +9,8 @@ class MediaEntry {
   String? nativeName;
   String? romajiName;
   String? coverImageURL;
+  String? coverImageURLHD;
+
   int? episodes;
 
   MediaEntry.fromMap(Map<String, dynamic> media) {
@@ -22,6 +24,7 @@ class MediaEntry {
 
     if (media.containsKey("coverImage")) {
       coverImageURL = media["coverImage"]["medium"] ?? "";
+      coverImageURL = media["coverImage"]["extraLarge"] ?? "";
     }
 
     episodes = media['episodes'];
