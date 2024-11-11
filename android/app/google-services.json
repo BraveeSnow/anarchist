@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "465019105822",
+    "project_id": "al-anarchist",
+    "storage_bucket": "al-anarchist.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465019105822:android:0c57b6bdadad6409ecf40f",
+        "android_client_info": {
+          "package_name": "world.snows.anarchist"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBG850GL11FfaJDOKDA9aU-FVFdvma2lT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

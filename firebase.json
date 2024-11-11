@@ -1,0 +1,22 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "al-anarchist",
+          "appId": "1:465019105822:android:0c57b6bdadad6409ecf40f",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "al-anarchist",
+          "configurations": {
+            "android": "1:465019105822:android:0c57b6bdadad6409ecf40f",
+            "ios": "1:465019105822:ios:48ce9bd9563314a4ecf40f"
+          }
+        }
+      }
+    }
+  }
+}
