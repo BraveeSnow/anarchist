@@ -1,3 +1,4 @@
+import 'package:anarchist/util/constants.dart';
 import 'package:anarchist/util/search_query.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catppuccin_flutter/catppuccin_flutter.dart';
@@ -32,7 +33,7 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(paddingScreenEdge),
                   child: Icon(Icons.warning),
                 ),
                 Text(snapshot.error.toString(), textAlign: TextAlign.center),
@@ -76,8 +77,8 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(watchlist.name, style: const TextStyle(fontSize: 24)),
+          padding: const EdgeInsets.all(paddingWidgetSpacer),
+          child: Text(watchlist.name, style: const TextStyle(fontSize: fontSizeSecondaryTitle)),
         ),
         ...watchlist.entries.map((e) => UserMediaEntryCard(
             userEntry: e, entryUpdateCallback: updateEntryCallback)),
@@ -117,7 +118,7 @@ class UserMediaEntryCard extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(paddingScreenEdge),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +161,31 @@ class UserMediaEntryCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text('${userEntry.progress}/${userEntry.mediaEntry.episodes ?? '?'}'),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (userEntry.score != 0)
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: paddingSmallSpacing),
+                    child: Icon(Icons.star, color: catppuccin.mocha.yellow),
+                  ),
+                  Text('${userEntry.score}/10'),
+                ],
+              ),
+            Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(right: paddingSmallSpacing),
+                  child: Icon(Icons.movie_outlined),
+                ),
+                Text(
+                    '${userEntry.progress}/${userEntry.mediaEntry.episodes ?? '?'}'),
+              ],
+            ),
+          ],
+        ),
         _statusButton(context)
       ],
     );
