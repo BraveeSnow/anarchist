@@ -32,7 +32,6 @@ class SearchCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         //ToDo: Implement On Click Logic
-        print("Clicked $nameEnglish}");
       },
       child: Container(
         decoration: const BoxDecoration(color: Colors.black12),

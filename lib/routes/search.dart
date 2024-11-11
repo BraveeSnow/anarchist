@@ -181,8 +181,6 @@ class _SearchPageState extends State<SearchPage> with SearchQueryHandler {
                     return SearchCard(entry: entries[index]);
                   },
                   itemCount: max(0, size)));
-
-          return Text("AAAA");
         });
   }
 }

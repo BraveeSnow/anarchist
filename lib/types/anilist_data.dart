@@ -5,13 +5,13 @@ class MediaEntry {
   MediaEntry(this.id);
 
   //Optional Data
-  String? englishName;
-  String? nativeName;
-  String? romajiName;
-  String? coverImageURL;
-  String? coverImageURLHD;
+  late final String? englishName;
+  late final String? nativeName;
+  late final String? romajiName;
+  late final String? coverImageURL;
+  late final String? coverImageURLHD;
 
-  int? episodes;
+  late final int? episodes;
 
   MediaEntry.fromMap(Map<String, dynamic> media) {
     id = media["id"];
