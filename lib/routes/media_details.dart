@@ -53,7 +53,12 @@ class MediaDetailsPage extends StatelessWidget with SearchQueryHandler {
             end: Alignment.bottomCenter,
             colors: [Colors.black, Colors.transparent],
           ).createShader(rect),
-          child: Image.network(details.coverImageURL!, height: _bannerHeight),
+          child: Image.network(
+            details.bannerImage,
+            height: _bannerHeight,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+          ),
         ),
         Text(details.preferredName!,
             style: const TextStyle(fontSize: fontSizeSecondaryTitle)),

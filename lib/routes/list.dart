@@ -1,4 +1,3 @@
-import 'package:anarchist/routes/media_details.dart';
 import 'package:anarchist/util/constants.dart';
 import 'package:anarchist/util/search_query.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -118,7 +117,7 @@ class UserMediaEntryCard extends StatelessWidget {
           const BoxConstraints(minHeight: _cardSize, maxHeight: _cardSize),
       child: GestureDetector(
         onTap: () {
-          context.go("/details/${userEntry.mediaEntry.id}");
+          context.push("/details/${userEntry.mediaEntry.id}");
         },
         child: Card.outlined(
           clipBehavior: Clip.hardEdge,

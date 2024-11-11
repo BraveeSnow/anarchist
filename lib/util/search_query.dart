@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
-import '../routes/media_details.dart';
 import 'data_handler.dart';
 
 final Uri _baseAPIURL = Uri.parse("https://graphql.anilist.co");
@@ -88,6 +87,7 @@ mixin SearchQueryHandler {
   static const String _getMediaDetailsQuery = r'''
   query($id: Int!) {
     Media(id: $id) {
+      id
       title {
         userPreferred
         native
@@ -117,6 +117,7 @@ mixin SearchQueryHandler {
         site
       }
       coverImage {
+        medium
         extraLarge
       }
       bannerImage
@@ -207,7 +208,7 @@ mixin SearchQueryHandler {
     );
 
     Map<String, dynamic> parsed = _parseResponse(res);
-    return DetailedMediaEntry.fromMap(parsed);
+    return DetailedMediaEntry.fromMap(parsed['data']['Media']);
   }
 
   Future<List<MediaEntry>> fetchTrending(String type,
