@@ -1,3 +1,4 @@
+import 'package:anarchist/types/anilist_data.dart';
 import 'package:anarchist/util/constants.dart';
 import 'package:anarchist/util/search_query.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ class _HomePageState extends State<HomePage> with SearchQueryHandler {
   static const int maxTrendingEntries = 5;
   static const double carouselItemExtent = 330;
 
-  late Future<List<SearchCard>> _trending;
+  late Future<List<MediaEntry>> _trending;
 
   _HomePageState() {
     _trending = fetchTrending("ANIME");
@@ -47,13 +48,14 @@ class _HomePageState extends State<HomePage> with SearchQueryHandler {
             return FutureBuilder(
               future: _trending,
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const CircularProgressIndicator();
                 }
 
+
                 return TrendingCard(
-                    title: snapshot.data![index].nameEnglish,
-                    imageUri: snapshot.data![index].coverImageURLHD);
+                    title: snapshot.data![index].englishName!,
+                    imageUri: snapshot.data![index].coverImageURLHD!);
               },
             );
           },

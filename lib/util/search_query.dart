@@ -22,7 +22,7 @@ class SearchCard extends StatelessWidget {
     nameEnglish = entry.englishName!;
     nameRomaji = entry.romajiName!;
     coverImageURL = entry.coverImageURL!;
-    coverImageURLHD = entry.coverImageURL!;
+    coverImageURLHD = entry.coverImageURLHD!;
   }
 
   @override
