@@ -118,8 +118,7 @@ class UserMediaEntryCard extends StatelessWidget {
           const BoxConstraints(minHeight: _cardSize, maxHeight: _cardSize),
       child: GestureDetector(
         onTap: () {
-          context.pushNamed(MediaDetailsPage.route,
-              pathParameters: {'id': userEntry.mediaEntry.id.toString()});
+          context.go("/details/${userEntry.mediaEntry.id}");
         },
         child: Card.outlined(
           clipBehavior: Clip.hardEdge,

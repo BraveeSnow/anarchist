@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:anarchist/types/anilist_data.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
+import '../routes/media_details.dart';
 import 'data_handler.dart';
 
 final Uri _baseAPIURL = Uri.parse("https://graphql.anilist.co");
@@ -28,7 +30,7 @@ class SearchCard extends StatelessWidget {
     double cWidth = MediaQuery.of(context).size.width * 0.8;
     return GestureDetector(
       onTap: () {
-        //ToDo: Implement On Click Logic
+        context.go("/details/${entry.id}");
       },
       child: Container(
         decoration: const BoxDecoration(color: Colors.black12),
