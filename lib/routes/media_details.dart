@@ -51,7 +51,7 @@ class MediaDetailsPage extends StatelessWidget with SearchQueryHandler {
           shaderCallback: (rect) => const LinearGradient(
             begin: Alignment.center,
             end: Alignment.bottomCenter,
-            colors: [Colors.black, Colors.transparent],
+            colors: [Colors.white, Colors.transparent],
           ).createShader(rect),
           child: Image.network(
             details.bannerImage,
