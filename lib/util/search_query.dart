@@ -10,11 +10,11 @@ import 'data_handler.dart';
 final Uri _baseAPIURL = Uri.parse("https://graphql.anilist.co");
 
 class SearchCard extends StatelessWidget {
-  late String nameNative;
-  late String nameEnglish;
-  late String nameRomaji;
-  late String coverImageURL;
-  late String coverImageURLHD;
+  late final String nameNative;
+  late final String nameEnglish;
+  late final String nameRomaji;
+  late final String coverImageURL;
+  late final String coverImageURLHD;
 
   final MediaEntry entry;
 
