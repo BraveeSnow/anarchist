@@ -1,6 +1,9 @@
 {
   "@@locale": "en",
 
+  "dialogCancel": "Cancel",
+  "dialogConfirm": "Confirm",
+
   "navbarHome": "Home",
   "navbarSearch": "Search",
   "navbarAnime": "Anime",
@@ -9,6 +12,14 @@
   "searchPlaceholder": "Search for anything...",
   "searchTop100": "Top 100",
   "searchTrending": "Trending",
+  "listWatching": "Watching",
+  "listPlanning": "Planning",
+  "listCompleted": "Completed",
+  "listDropped": "Dropped",
+  "listPaused": "Paused",
+  "listRepeating": "Re-watching",
+  "listChangeListTitle": "Move to Another List",
+  "listChangeListDialog": "Select the new list for the entry to be added into:",
   "loginSkip": "Skip",
   "loginConnect": "Connect with AniList",
   "loginSkipDialogTitle": "Skip Login?",
