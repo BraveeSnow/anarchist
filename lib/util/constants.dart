@@ -1,6 +1,7 @@
 // ----- FONT SIZES -----
 
 const double fontSizeSecondaryTitle = 24;
+const double fontSizeTertiaryTitle = 20;
 
 
 

@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 
 class MediaDetailsPage extends StatelessWidget with SearchQueryHandler {
   static const String route = '/details/:id';
-  static const double _bannerHeight = 256;
+  static const double _bannerHeight = 200;
 
   late final Future<DetailedMediaEntry> _mediaEntry;
 
@@ -18,6 +18,8 @@ class MediaDetailsPage extends StatelessWidget with SearchQueryHandler {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         leading: IconButton(
           onPressed: () {
             context.pop();
@@ -25,6 +27,7 @@ class MediaDetailsPage extends StatelessWidget with SearchQueryHandler {
           icon: const Icon(Icons.arrow_back),
         ),
       ),
+      extendBodyBehindAppBar: true,
       body: FutureBuilder(
         future: _mediaEntry,
         builder: (context, snapshot) {
@@ -60,9 +63,53 @@ class MediaDetailsPage extends StatelessWidget with SearchQueryHandler {
             alignment: Alignment.center,
           ),
         ),
-        Text(details.preferredName!,
-            style: const TextStyle(fontSize: fontSizeSecondaryTitle)),
+        _titleInformation(details),
       ],
+    );
+  }
+
+  Widget _titleInformation(DetailedMediaEntry details) {
+    return SizedBox(
+      height: 150,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: paddingWidgetSpacer),
+            child: Image.network(
+              details.coverImageURLHD!,
+            ),
+          ),
+          Flexible(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  details.preferredName!,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                Row(
+                  children: [
+                    IconButton.filledTonal(
+                      onPressed: () {},
+                      icon: const Icon(Icons.favorite_outline),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.playlist_add),
+                      label: const Text('Add to List'),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
