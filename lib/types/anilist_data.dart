@@ -117,10 +117,18 @@ class UserIdentity {
   final UserRatingScheme ratingScheme;
   final String rowOrder;
   final List<String> animeSectionOrder = [];
+  final String userimg;
+  final String bannerimg;
+  final String aboutme;
+  final List<dynamic> favoriteanimesid;
 
   UserIdentity.fromMap(Map<String, dynamic> data)
       : id = data['id'],
         name = data['name'],
+        userimg = data['avatar']['medium'] ?? "DEFAULT IMG",
+        bannerimg = data['bannerImage'] ?? "DEFAULT BANNER",
+        aboutme = data['about'] ?? "",
+        favoriteanimesid = data['favourites']['anime']['nodes'] ?? [],
         ratingScheme =
             UserRatingScheme.from(data['mediaListOptions']['scoreFormat']),
         rowOrder = data['mediaListOptions']['rowOrder'] {

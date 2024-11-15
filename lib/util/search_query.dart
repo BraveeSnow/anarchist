@@ -241,6 +241,52 @@ mixin AuthorizedQueryHandler {
     }
   ''';
 
+  static const String _getUserIdentityQueryFromName = r'''
+    query($username: String!){
+      User(name: $username){
+          id
+          name
+          avatar {
+            medium
+          }
+          bannerImage
+          about
+          mediaListOptions{
+            scoreFormat
+            rowOrder
+            animeList{
+              sectionOrder
+            }
+          }
+          favourites{
+           anime{
+            nodes {
+              id
+            }
+          }
+        }
+      }
+    }
+  ''';
+
+  static const String _getMediaFromId = r'''
+    query($animeid: Int!){
+      Media (id: $animeid){
+       type
+       title {
+         romaji
+         english
+         native
+         userPreferred
+        }
+        coverImage {
+          medium
+          extraLarge
+        }
+      }
+    }
+  ''';
+
   static const String _getUserListsQuery = r'''
     query ($userId: Int!, $type: MediaType!) {
       MediaListCollection(userId: $userId, type: $type) {
@@ -293,6 +339,52 @@ mixin AuthorizedQueryHandler {
       }
     }
   ''';
+
+  Future<MediaEntry?> getmediafromID(int id) async {
+    http.Response res = await http.post(_baseAPIURL, body: jsonEncode({
+      'query': _getMediaFromId,
+      'variables': {'animeid':id}
+    }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+    );
+    if (res.statusCode != 200){
+      log("Received error ${res.statusCode}:\n${res.body}");
+      return null;
+    }
+
+    dynamic decoded = jsonDecode(res.body);
+    if (decoded is! Map) {
+      return null;
+    }
+
+    dynamic rawData = decoded['data']['User'];
+    return MediaEntry.fromMap(rawData);
+  }
+
+  Future<UserIdentity?> getUserIdentityfromName(String searchname) async{
+    http.Response res = await http.post(_baseAPIURL, body: jsonEncode({
+      'query': _getUserIdentityQueryFromName,
+      'variables': {'username':searchname}
+    }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    );
+    if (res.statusCode != 200){
+      log("Received error ${res.statusCode}:\n${res.body}");
+      return null;
+    }
+
+    dynamic decoded = jsonDecode(res.body);
+    if (decoded is! Map) {
+      return null;
+    }
+
+    dynamic rawData = decoded['data']['User'];
+    return UserIdentity.fromMap(rawData);
+  }
 
   Future<UserIdentity?> getUserIdentity(String token) async {
     http.Response res = await http.post(_baseAPIURL, body: {
@@ -353,6 +445,11 @@ mixin AuthorizedQueryHandler {
 
     return watchlists;
   }
+
+  //Get user images in user identity query
+
+
+  //
 
   /// Updates a [UserMediaEntry] through the GraphQL API.
   ///

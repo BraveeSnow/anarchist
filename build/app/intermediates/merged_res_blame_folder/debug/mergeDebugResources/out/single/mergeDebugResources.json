@@ -1,0 +1,74 @@
+[
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-xxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-xxhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-xxxhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-xhdpi_ic_launcher_foreground.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-xhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-mdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-mdpi_ic_launcher_foreground.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-mdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/drawable-v21_launch_background.xml.flat",
+        "source": "world.snows.anarchist.app-main-22:/drawable-v21/launch_background.xml"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-hdpi_ic_launcher_foreground.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-hdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "world.snows.anarchist.app-debug-27:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "world.snows.anarchist.app-main-22:/mipmap-xhdpi/ic_launcher.webp"
+    }
+]
