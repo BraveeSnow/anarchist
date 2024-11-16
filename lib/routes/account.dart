@@ -1,9 +1,7 @@
-import 'package:anarchist/types/anarchist_data.dart';
 import 'package:anarchist/types/anilist_data.dart';
 import 'package:anarchist/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:anarchist/util/search_query.dart';
-import 'package:anarchist/util/data_handler.dart';
 
 class AccountPage extends StatelessWidget with AuthorizedQueryHandler {
   const AccountPage({super.key});
@@ -93,7 +91,7 @@ class AccountPage extends StatelessWidget with AuthorizedQueryHandler {
                         fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 5), // Spacing between rows
-                  Row(
+                  const Row(
                     children: [
                       Text("1", style: TextStyle(fontSize: 16)),
                       SizedBox(width: 10), // Spacing between elements
