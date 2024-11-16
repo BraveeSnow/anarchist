@@ -272,6 +272,7 @@ mixin AuthorizedQueryHandler {
   static const String _getMediaFromId = r'''
     query($animeid: Int!){
       Media (id: $animeid){
+      id
        type
        title {
          romaji
@@ -358,8 +359,8 @@ mixin AuthorizedQueryHandler {
     if (decoded is! Map) {
       return null;
     }
-
-    dynamic rawData = decoded['data']['User'];
+    print(decoded);
+    dynamic rawData = decoded['data']['Media'];
     return MediaEntry.fromMap(rawData);
   }
 

@@ -154,8 +154,31 @@ class AccountPage extends StatelessWidget with AuthorizedQueryHandler {
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           String title = snapshot.data?.englishName ?? 'Unknown';
-          return Text("$title");
-        } else {
+          String image = snapshot.data?.coverImageURLHD ?? 'https://cdn.frankerfacez.com/emoticon/742598/4';
+
+          return Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: 110,
+            alignment: Alignment.bottomCenter,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(image),
+                alignment: Alignment.center,
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: ColoredBox(
+              color: Colors.black.withOpacity(0.75),
+              child: Text(
+                title,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          );
+          } else {
           return Text("No data available");
         }
       },

@@ -24,7 +24,7 @@ class MediaEntry {
 
     if (media.containsKey("coverImage")) {
       coverImageURL = media["coverImage"]["medium"] ?? "";
-      coverImageURL = media["coverImage"]["extraLarge"] ?? "";
+      coverImageURLHD = media["coverImage"]["extraLarge"] ?? "";
     }
 
     episodes = media['episodes'];
