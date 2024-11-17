@@ -89,6 +89,8 @@ class DetailedMediaEntry extends MediaEntry {
   final int averageScore;
   final int meanScore;
   final int popularity;
+  final List<ScoreDistribution> scoreDistribution = [];
+  final List<StatusDistribution> statusDistribution = [];
 
   DetailedMediaEntry.fromMap(Map<String, dynamic> media)
       : type = MediaType.from(media['type']),
@@ -114,6 +116,52 @@ class DetailedMediaEntry extends MediaEntry {
         genres.add(genre);
       }
     }
+
+    if (media['stats']['scoreDistribution'] is List) {
+      for (var score in media['stats']['scoreDistribution']) {
+        scoreDistribution.add(ScoreDistribution.fromMap(score));
+      }
+    }
+
+    if (media['stats']['statusDistribution'] is List) {
+      for (var status in media['stats']['statusDistribution']) {
+        statusDistribution.add(StatusDistribution.fromMap(status));
+      }
+    }
+  }
+}
+
+class ScoreDistribution {
+  final int score;
+  final int amount;
+
+  ScoreDistribution({
+    required this.score,
+    required this.amount,
+  });
+
+  factory ScoreDistribution.fromMap(Map<String, dynamic> map) {
+    return ScoreDistribution(
+      score: map['score'] as int,
+      amount: map['amount'] as int,
+    );
+  }
+}
+
+class StatusDistribution {
+  final String status;
+  final int amount;
+
+  StatusDistribution({
+    required this.status,
+    required this.amount,
+  });
+
+  factory StatusDistribution.fromMap(Map<String, dynamic> map) {
+    return StatusDistribution(
+      status: map['status'] as String,
+      amount: map['amount'] as int,
+    );
   }
 }
 
