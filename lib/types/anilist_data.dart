@@ -55,6 +55,7 @@ class MediaEntry {
   late final String? nativeName;
   late final String? coverImageURL;
   late final String? coverImageURLHD;
+  late final List<dynamic>? genre;
 
   late final int? episodes;
 
@@ -64,6 +65,10 @@ class MediaEntry {
     if (media.containsKey("title")) {
       preferredName = media["title"]["userPreferred"];
       nativeName = media["title"]["native"] ?? "";
+    }
+
+    if (media.containsKey("genres")){
+      genre = media["genres"] ?? "NaN";
     }
 
     if (media.containsKey("coverImage")) {
@@ -289,10 +294,18 @@ class UserIdentity {
   final UserRatingScheme ratingScheme;
   final UserRowOrder rowOrder;
   final List<String> animeSectionOrder = [];
+  final String userimg;
+  final String bannerimg;
+  final String aboutme;
+  final List<dynamic> favoriteanimesid;
 
   UserIdentity.fromMap(Map<String, dynamic> data)
       : id = data['id'],
         name = data['name'],
+        userimg = data['avatar']['medium'] ?? "DEFAULT IMG",
+        bannerimg = data['bannerImage'] ?? "DEFAULT BANNER",
+        aboutme = data['about'] ?? "",
+        favoriteanimesid = data['favourites']['anime']['nodes'] ?? [],
         ratingScheme =
             UserRatingScheme.from(data['mediaListOptions']['scoreFormat']),
         rowOrder = UserRowOrder.from(data['mediaListOptions']['rowOrder']) {
