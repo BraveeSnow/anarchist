@@ -219,7 +219,7 @@ class AccountPage extends StatelessWidget with AuthorizedQueryHandler {
       child: ColoredBox(
         color: Colors.black.withOpacity(0.75),
         child: Text(
-          entry.englishName ?? "",
+          entry.preferredName ?? "",
           style: const TextStyle(color: Colors.white, fontSize: 16),
           textAlign: TextAlign.center,
           maxLines: 1,

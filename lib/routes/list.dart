@@ -1,3 +1,4 @@
+import 'package:anarchist/util/constants.dart';
 import 'package:anarchist/util/search_query.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catppuccin_flutter/catppuccin_flutter.dart';
@@ -27,18 +28,7 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
       stream: _userWatchlists.asStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Icon(Icons.warning),
-                ),
-                Text(snapshot.error.toString(), textAlign: TextAlign.center),
-              ],
-            ),
-          );
+          errorScreen(snapshot.error);
         }
         if (!snapshot.hasData) {
           return const Center(
@@ -48,6 +38,8 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
 
         Map<String, UserWatchlist> mappedUserLists = {};
         for (final watchlist in snapshot.data!) {
+          watchlist.entries
+              .sort(DataHandler().identity?.rowOrder.getSortFunction());
           mappedUserLists[watchlist.name] = watchlist;
         }
 
@@ -76,8 +68,9 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(watchlist.name, style: const TextStyle(fontSize: 24)),
+          padding: const EdgeInsets.all(paddingWidgetSpacer),
+          child: Text(watchlist.name,
+              style: const TextStyle(fontSize: fontSizeSecondaryTitle)),
         ),
         ...watchlist.entries.map((e) => UserMediaEntryCard(
             userEntry: e, entryUpdateCallback: updateEntryCallback)),
@@ -85,8 +78,23 @@ class _ListPageState extends State<ListPage> with AuthorizedQueryHandler {
     );
   }
 
-  void updateEntryCallback(int mediaId, MediaListStatus status) {
-    mutateUserMediaEntry(mediaId, status);
+  Widget errorScreen(Object? error) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(paddingScreenEdge),
+            child: Icon(Icons.warning),
+          ),
+          Text(error.toString(), textAlign: TextAlign.center),
+        ],
+      ),
+    );
+  }
+
+  void updateEntryCallback(int mediaId, MediaListStatus status) async {
+    await mutateUserMediaEntry(mediaId, status);
     setState(() {
       _userWatchlists = fetchUserLists(widget.mediaType);
     });
@@ -107,28 +115,33 @@ class UserMediaEntryCard extends StatelessWidget {
     return ConstrainedBox(
       constraints:
           const BoxConstraints(minHeight: _cardSize, maxHeight: _cardSize),
-      child: Card.outlined(
-        clipBehavior: Clip.hardEdge,
-        child: Row(
-          children: [
-            CachedNetworkImage(
-              imageUrl: userEntry.mediaEntry.coverImageURL!,
-              fit: BoxFit.fitHeight,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _titleLabels(context),
-                    _statusRow(context),
-                  ],
+      child: GestureDetector(
+        onTap: () {
+          context.push("/details/${userEntry.mediaEntry.id}");
+        },
+        child: Card.outlined(
+          clipBehavior: Clip.hardEdge,
+          child: Row(
+            children: [
+              CachedNetworkImage(
+                imageUrl: userEntry.mediaEntry.coverImageURL!,
+                fit: BoxFit.fitHeight,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(paddingScreenEdge),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _titleLabels(context),
+                      _statusRow(context),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -139,9 +152,7 @@ class UserMediaEntryCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          userEntry.mediaEntry.englishName!.isNotEmpty
-              ? userEntry.mediaEntry.englishName!
-              : userEntry.mediaEntry.romajiName!,
+          userEntry.mediaEntry.preferredName!,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
@@ -160,7 +171,31 @@ class UserMediaEntryCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text('${userEntry.progress}/${userEntry.mediaEntry.episodes ?? '?'}'),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (userEntry.score != 0)
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: paddingSmallSpacing),
+                    child: Icon(Icons.star, color: catppuccin.mocha.yellow),
+                  ),
+                  Text('${userEntry.score}/10'),
+                ],
+              ),
+            Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(right: paddingSmallSpacing),
+                  child: Icon(Icons.movie_outlined),
+                ),
+                Text(
+                    '${userEntry.progress}/${userEntry.mediaEntry.episodes ?? '?'}'),
+              ],
+            ),
+          ],
+        ),
         _statusButton(context)
       ],
     );

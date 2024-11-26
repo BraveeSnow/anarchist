@@ -1,23 +1,38 @@
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:anarchist/firebase_options.dart';
 import 'package:anarchist/login.dart';
 import 'package:anarchist/routes/account.dart';
 import 'package:anarchist/routes/home.dart';
 import 'package:anarchist/routes/list.dart';
+import 'package:anarchist/routes/media_details.dart';
 import 'package:anarchist/routes/search.dart';
 import 'package:anarchist/types/anarchist_data.dart';
 import 'package:anarchist/types/oauth_response.dart';
 import 'package:anarchist/util/data_handler.dart';
 import 'package:anarchist/util/oauth_handler.dart';
 import 'package:anarchist/util/search_query.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 
-void main() {
+void main() async {
   usePathUrlStrategy();
+
+  // configure firebase
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack);
+    return true;
+  };
+
   runApp(const Anarchist());
 }
 
@@ -53,6 +68,10 @@ class _AnarchistState extends State<Anarchist> {
           ),
         ],
       ),
+      GoRoute(
+          path: MediaDetailsPage.route,
+          builder: (context, state) => MediaDetailsPage(
+              mediaId: int.parse(state.pathParameters['id']!))),
     ],
   );
 

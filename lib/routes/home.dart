@@ -3,6 +3,7 @@ import 'package:anarchist/util/constants.dart';
 import 'package:anarchist/util/search_query.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,31 +37,31 @@ class _HomePageState extends State<HomePage> with SearchQueryHandler {
   }
 
   Widget trendingCarousel(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-          maxHeight: 250, maxWidth: MediaQuery.sizeOf(context).width),
-      child: CarouselView(
-        itemExtent: carouselItemExtent,
-        itemSnapping: true,
-        children: List.generate(
-          maxTrendingEntries,
-          (index) {
-            return FutureBuilder(
-              future: _trending,
-              builder: (context, snapshot) {
+    return FutureBuilder(
+      future: _trending,
+      builder: (context, snapshot) {
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+              maxHeight: 250, maxWidth: MediaQuery.of(context).size.width),
+          child: CarouselView(
+            itemExtent: carouselItemExtent,
+            itemSnapping: true,
+            onTap: (index) {
+              context.push('/details/${snapshot.data![index].id}');
+            },
+            children: List.generate(
+              maxTrendingEntries,
+              (index) {
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const CircularProgressIndicator();
                 }
 
-
-                return TrendingCard(
-                    title: snapshot.data![index].englishName!,
-                    imageUri: snapshot.data![index].coverImageURLHD!);
+                return TrendingCard(entry: snapshot.data![index]);
               },
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -70,13 +71,11 @@ class _HomePageState extends State<HomePage> with SearchQueryHandler {
 // }
 
 class TrendingCard extends StatelessWidget {
-  final String title;
-  final String imageUri;
+  final MediaEntry entry;
 
   const TrendingCard({
     super.key,
-    required this.title,
-    required this.imageUri,
+    required this.entry,
   });
 
   @override
@@ -85,7 +84,7 @@ class TrendingCard extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage(imageUri),
+          image: NetworkImage(entry.coverImageURLHD!),
           alignment: Alignment.center,
           fit: BoxFit.cover,
         ),
@@ -98,7 +97,7 @@ class TrendingCard extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: Text(
-                title,
+                entry.preferredName!,
                 style: const TextStyle(color: Colors.white, fontSize: 20),
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.fade,

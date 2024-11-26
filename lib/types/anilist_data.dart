@@ -1,13 +1,58 @@
 //ToDo: Actually use this
+import '../util/search_query.dart';
+
+enum MediaFormat {
+  tv,
+  tvShort,
+  movie,
+  special,
+  ova,
+  ona,
+  music,
+  manga,
+  novel,
+  oneShot;
+
+  factory MediaFormat.from(String raw) => switch (raw) {
+        'TV' => MediaFormat.tv,
+        'TV_SHORT' => MediaFormat.tvShort,
+        'MOVIE' => MediaFormat.movie,
+        'SPECIAL' => MediaFormat.special,
+        'OVA' => MediaFormat.ova,
+        'ONA' => MediaFormat.ona,
+        'MUSIC' => MediaFormat.music,
+        'MANGA' => MediaFormat.manga,
+        'NOVEL' => MediaFormat.novel,
+        'ONE_SHOT' => MediaFormat.oneShot,
+        String() => throw ArgumentError('invalid media format "$raw"'),
+      };
+}
+
+enum MediaStatus {
+  finished,
+  releasing,
+  notYetReleased,
+  cancelled,
+  hiatus;
+
+  factory MediaStatus.from(String raw) => switch (raw) {
+        'FINISHED' => MediaStatus.finished,
+        'RELEASING' => MediaStatus.releasing,
+        'NOT_YET_RELEASED' => MediaStatus.notYetReleased,
+        'CANCELLED' => MediaStatus.cancelled,
+        'HIATUS' => MediaStatus.hiatus,
+        String() => throw ArgumentError('invalid media status "$raw"'),
+      };
+}
+
 class MediaEntry {
   late int id;
 
   MediaEntry(this.id);
 
   //Optional Data
-  late final String? englishName;
+  late final String? preferredName;
   late final String? nativeName;
-  late final String? romajiName;
   late final String? coverImageURL;
   late final String? coverImageURLHD;
   late final List<dynamic>? genre;
@@ -18,9 +63,8 @@ class MediaEntry {
     id = media["id"];
 
     if (media.containsKey("title")) {
-      englishName = media["title"]["english"] ?? "";
+      preferredName = media["title"]["userPreferred"];
       nativeName = media["title"]["native"] ?? "";
-      romajiName = media["title"]["romaji"] ?? "";
     }
 
     if (media.containsKey("genres")){
@@ -33,6 +77,96 @@ class MediaEntry {
     }
 
     episodes = media['episodes'];
+  }
+}
+
+class DetailedMediaEntry extends MediaEntry {
+  final MediaType type;
+  final MediaFormat format;
+  final MediaStatus status;
+  final String description;
+  final DateTime startDate;
+  final DateTime endDate;
+  final Duration averageDuration;
+  final String? ytTrailerId;
+  final String bannerImage;
+  final List<String> genres = [];
+  final int averageScore;
+  final int meanScore;
+  final int popularity;
+  final List<ScoreDistribution> scoreDistribution = [];
+  final List<StatusDistribution> statusDistribution = [];
+
+  DetailedMediaEntry.fromMap(Map<String, dynamic> media)
+      : type = MediaType.from(media['type']),
+        format = MediaFormat.from(media['format']),
+        status = MediaStatus.from(media['status']),
+        description = media['description'],
+        startDate = DateTime(media['startDate']['year'],
+            media['startDate']['month'], media['startDate']['day']),
+        endDate = DateTime(media['endDate']['year'], media['endDate']['month'],
+            media['endDate']['day']),
+        averageDuration = Duration(minutes: media['duration']),
+        ytTrailerId = media['trailer']['site'] == 'youtube'
+            ? media['trailer']['id']
+            : null,
+        bannerImage = media['bannerImage'],
+        averageScore = media['averageScore'],
+        meanScore = media['meanScore'],
+        popularity = media['popularity'],
+        super.fromMap(media) {
+    // initialize list values
+    if (media['genres'] is List<String>) {
+      for (String genre in media['genres']) {
+        genres.add(genre);
+      }
+    }
+
+    if (media['stats']['scoreDistribution'] is List) {
+      for (var score in media['stats']['scoreDistribution']) {
+        scoreDistribution.add(ScoreDistribution.fromMap(score));
+      }
+    }
+
+    if (media['stats']['statusDistribution'] is List) {
+      for (var status in media['stats']['statusDistribution']) {
+        statusDistribution.add(StatusDistribution.fromMap(status));
+      }
+    }
+  }
+}
+
+class ScoreDistribution {
+  final int score;
+  final int amount;
+
+  ScoreDistribution({
+    required this.score,
+    required this.amount,
+  });
+
+  factory ScoreDistribution.fromMap(Map<String, dynamic> map) {
+    return ScoreDistribution(
+      score: map['score'] as int,
+      amount: map['amount'] as int,
+    );
+  }
+}
+
+class StatusDistribution {
+  final String status;
+  final int amount;
+
+  StatusDistribution({
+    required this.status,
+    required this.amount,
+  });
+
+  factory StatusDistribution.fromMap(Map<String, dynamic> map) {
+    return StatusDistribution(
+      status: map['status'] as String,
+      amount: map['amount'] as int,
+    );
   }
 }
 
@@ -70,6 +204,7 @@ class UserMediaEntry {
   final int score; // do not display ratings of 0
   final MediaListStatus status;
   final int progress;
+  final int lastUpdated;
   final MediaEntry mediaEntry;
 
   UserMediaEntry.fromMap(Map<String, dynamic> data)
@@ -77,6 +212,7 @@ class UserMediaEntry {
         score = data['score'],
         status = MediaListStatus.from(data['status']),
         progress = data['progress'],
+        lastUpdated = data['updatedAt'],
         mediaEntry = MediaEntry.fromMap(data['media']);
 }
 
@@ -116,11 +252,47 @@ enum UserRatingScheme {
       };
 }
 
+enum UserRowOrder {
+  score,
+  title,
+  lastUpdated,
+  lastAdded; // sorted using user entry id
+
+  factory UserRowOrder.from(String raw) => switch (raw) {
+        'score' => UserRowOrder.score,
+        'title' => UserRowOrder.title,
+        'updatedAt' => UserRowOrder.lastUpdated,
+        'id' => UserRowOrder.lastAdded,
+        String() => throw ArgumentError('Invalid row order string "$raw"'),
+      };
+
+  int Function(UserMediaEntry, UserMediaEntry) getSortFunction() =>
+      switch (this) {
+        // not fully perfect with symbols, as seen with entries like FSN UBW
+        // and FSN Heaven's Feel
+        UserRowOrder.title => (e1, e2) => _titleSort(e1, e2),
+        UserRowOrder.score => (e1, e2) {
+            if (e1.score == e2.score) {
+              return _titleSort(e1, e2);
+            }
+            // replicate behavior on platform: highest rated first
+            return e2.score.compareTo(e1.score);
+          },
+        UserRowOrder.lastUpdated => (e1, e2) =>
+            e2.lastUpdated.compareTo(e1.lastUpdated),
+        UserRowOrder.lastAdded => (e1, e2) => e2.id.compareTo(e1.id),
+      };
+
+  int _titleSort(UserMediaEntry e1, UserMediaEntry e2) =>
+      (e1.mediaEntry.preferredName?.toLowerCase() ?? '')
+          .compareTo(e2.mediaEntry.preferredName?.toLowerCase() ?? '');
+}
+
 class UserIdentity {
   final int id;
   final String name;
   final UserRatingScheme ratingScheme;
-  final String rowOrder;
+  final UserRowOrder rowOrder;
   final List<String> animeSectionOrder = [];
   final String userimg;
   final String bannerimg;
@@ -136,7 +308,7 @@ class UserIdentity {
         favoriteanimesid = data['favourites']['anime']['nodes'] ?? [],
         ratingScheme =
             UserRatingScheme.from(data['mediaListOptions']['scoreFormat']),
-        rowOrder = data['mediaListOptions']['rowOrder'] {
+        rowOrder = UserRowOrder.from(data['mediaListOptions']['rowOrder']) {
     for (String section in data['mediaListOptions']['animeList']
         ['sectionOrder']) {
       animeSectionOrder.add(section);
