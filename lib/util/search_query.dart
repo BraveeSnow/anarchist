@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:ffi';
 
 import 'package:anarchist/types/anilist_data.dart';
 import 'package:flutter/material.dart';
@@ -270,19 +271,22 @@ mixin AuthorizedQueryHandler {
   ''';
 
   static const String _getMediaFromId = r'''
-    query($animeid: Int!){
-      Media (id: $animeid){
-      id
-       type
-       title {
-         romaji
-         english
-         native
-         userPreferred
-        }
-        coverImage {
-          medium
-          extraLarge
+    query($animeids: [Int]){
+      Page{
+        media(idMal_in:$animeids type: ANIME){
+          id
+          type
+          genres
+          title{
+            romaji
+            english
+            native
+            userPreferred
+          }
+          coverImage {
+            medium
+            extraLarge
+          }
         }
       }
     }
@@ -317,6 +321,14 @@ mixin AuthorizedQueryHandler {
         }
   ''';
 
+  static const String _mutateUserSettings = r'''
+    mutation ($id: Int!, $aboutstring: String!, $adultbool: bool!, $timezoneval: String!){
+      UpdateUser(about: $aboutstring, displayAdultContent: $adultbool, timezone: $timezoneval){
+        id
+      }
+    }
+  ''';
+
   static const String _mutateMediaEntry = r'''
     mutation ($id: Int!, $status: MediaListStatus) {
       SaveMediaListEntry(id: $id, status: $status) {
@@ -341,10 +353,35 @@ mixin AuthorizedQueryHandler {
     }
   ''';
 
-  Future<MediaEntry?> getmediafromID(int id) async {
+  Future<UserIdentity?> updateUserpreference(String? token, int id, String about, bool adultcont, String timezone) async{
+    http.Response res = await http.post(_baseAPIURL, body: jsonEncode({
+      'query': _mutateUserSettings,
+      'variables': {'id': id, 'aboutstring': about, 'adultbool': adultcont, 'timezoneval': timezone}
+    }),
+      headers: {
+        'Authorization': 'Bearer $token',
+      }
+    );
+
+    if (res.statusCode != 200) {
+      log(res.body);
+      return null;
+    }
+
+    dynamic decoded = jsonDecode(res.body);
+    if (decoded is! Map) {
+      log('Received data was not JSON encoded');
+      return null;
+    }
+
+    dynamic rawData = decoded['data']['User'];
+    return UserIdentity.fromMap(rawData);
+  }
+
+  Future<List<MediaEntry>?> getmediafromID(List<int> id) async {
     http.Response res = await http.post(_baseAPIURL, body: jsonEncode({
       'query': _getMediaFromId,
-      'variables': {'animeid':id}
+      'variables': {'animeids':id}
     }),
         headers: {
           'Content-Type': 'application/json'
@@ -355,13 +392,22 @@ mixin AuthorizedQueryHandler {
       return null;
     }
 
+
     dynamic decoded = jsonDecode(res.body);
     if (decoded is! Map) {
       return null;
     }
-    print(decoded);
-    dynamic rawData = decoded['data']['Media'];
-    return MediaEntry.fromMap(rawData);
+    dynamic rawData = decoded['data']['Page']['media'];
+
+    List<MediaEntry>? listofmediaentries= [];
+    for (var item in rawData){
+      listofmediaentries.add(MediaEntry.fromMap(item));
+    }
+
+    for (var item in listofmediaentries){
+      print(item.englishName);
+    }
+    return listofmediaentries;
   }
 
   Future<UserIdentity?> getUserIdentityfromName(String searchname) async{

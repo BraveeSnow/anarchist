@@ -10,6 +10,7 @@ class MediaEntry {
   late final String? romajiName;
   late final String? coverImageURL;
   late final String? coverImageURLHD;
+  late final List<dynamic>? genre;
 
   late final int? episodes;
 
@@ -20,6 +21,10 @@ class MediaEntry {
       englishName = media["title"]["english"] ?? "";
       nativeName = media["title"]["native"] ?? "";
       romajiName = media["title"]["romaji"] ?? "";
+    }
+
+    if (media.containsKey("genres")){
+      genre = media["genres"] ?? "NaN";
     }
 
     if (media.containsKey("coverImage")) {
