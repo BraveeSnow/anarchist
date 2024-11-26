@@ -1,4 +1,8 @@
 //ToDo: Actually use this
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
 import '../util/search_query.dart';
 
 enum MediaFormat {
@@ -53,6 +57,7 @@ class MediaEntry {
   //Optional Data
   late final String? preferredName;
   late final String? nativeName;
+  late final Color coverImageColor;
   late final String? coverImageURL;
   late final String? coverImageURLHD;
   late final List<dynamic>? genre;
@@ -67,11 +72,15 @@ class MediaEntry {
       nativeName = media["title"]["native"] ?? "";
     }
 
-    if (media.containsKey("genres")){
+    if (media.containsKey("genres")) {
       genre = media["genres"] ?? "NaN";
     }
 
     if (media.containsKey("coverImage")) {
+      coverImageColor = media["coverImage"]["color"] != null
+          ? Color(
+              int.parse(media["coverImage"]["color"].substring(1), radix: 16))
+          : Colors.white;
       coverImageURL = media["coverImage"]["medium"] ?? "";
       coverImageURLHD = media["coverImage"]["extraLarge"] ?? "";
     }
@@ -81,19 +90,19 @@ class MediaEntry {
 }
 
 class DetailedMediaEntry extends MediaEntry {
-  final MediaType type;
-  final MediaFormat format;
-  final MediaStatus status;
-  final String description;
-  final DateTime startDate;
-  final DateTime endDate;
+  final MediaType? type;
+  final MediaFormat? format;
+  final MediaStatus? status;
+  final String? description;
+  late final DateTime? startDate;
+  late final DateTime? endDate;
   final Duration averageDuration;
   final String? ytTrailerId;
-  final String bannerImage;
+  final String? bannerImage;
   final List<String> genres = [];
-  final int averageScore;
-  final int meanScore;
-  final int popularity;
+  final int? averageScore;
+  final int? meanScore;
+  final int? popularity;
   final List<ScoreDistribution> scoreDistribution = [];
   final List<StatusDistribution> statusDistribution = [];
 
@@ -102,10 +111,6 @@ class DetailedMediaEntry extends MediaEntry {
         format = MediaFormat.from(media['format']),
         status = MediaStatus.from(media['status']),
         description = media['description'],
-        startDate = DateTime(media['startDate']['year'],
-            media['startDate']['month'], media['startDate']['day']),
-        endDate = DateTime(media['endDate']['year'], media['endDate']['month'],
-            media['endDate']['day']),
         averageDuration = Duration(minutes: media['duration']),
         ytTrailerId = media['trailer']['site'] == 'youtube'
             ? media['trailer']['id']
@@ -120,6 +125,24 @@ class DetailedMediaEntry extends MediaEntry {
       for (String genre in media['genres']) {
         genres.add(genre);
       }
+    }
+
+    if (media['startDate']['year'] != null &&
+        media['startDate']['month'] != null &&
+        media['startDate']['day'] != null) {
+      startDate = DateTime(media['startDate']['year'],
+          media['startDate']['month'], media['startDate']['day']);
+    } else {
+      startDate = null;
+    }
+
+    if (media['endDate']['year'] != null &&
+        media['endDate']['month'] != null &&
+        media['endDate']['day'] != null) {
+      endDate = DateTime(media['endDate']['year'], media['endDate']['month'],
+          media['endDate']['day']);
+    } else {
+      endDate = null;
     }
 
     if (media['stats']['scoreDistribution'] is List) {
