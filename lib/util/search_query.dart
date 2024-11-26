@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:anarchist/types/anilist_data.dart';
 import 'package:flutter/material.dart';
@@ -324,11 +325,23 @@ mixin AuthorizedQueryHandler {
       Viewer {
         id
         name
+        avatar {
+          medium
+        }
+        bannerImage
+        about
         mediaListOptions {
           scoreFormat
           rowOrder
           animeList {
             sectionOrder
+          }
+        }
+        favourites {
+           anime {
+            nodes {
+              id
+            }
           }
         }
       }
@@ -498,7 +511,7 @@ mixin AuthorizedQueryHandler {
     }
 
     for (var item in listofmediaentries){
-      print(item.englishName);
+      print(item.preferredName);
     }
     return listofmediaentries;
   }
