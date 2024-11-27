@@ -61,5 +61,9 @@ class DataHandler with AuthorizedQueryHandler {
       f = await f.create(recursive: true);
     }
     await f.writeAsString(jsonEncode(data));
+
+    if (data.accessToken != null) {
+      identity = await getUserIdentity(data.accessToken!);
+    }
   }
 }
