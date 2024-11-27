@@ -210,7 +210,6 @@ class AccountPage extends StatelessWidget with AuthorizedQueryHandler {
   }
 
   Widget _animeCard(MediaEntry entry) {
-    print("CARD: ${entry.preferredName}");
     return Container(
       width: 120,
       height: 200,
