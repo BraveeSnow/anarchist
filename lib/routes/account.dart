@@ -1,5 +1,7 @@
 import 'package:anarchist/types/anilist_data.dart';
+import 'package:anarchist/types/userprefs.dart';
 import 'package:anarchist/util/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:anarchist/util/search_query.dart';
 import 'package:anarchist/util/data_handler.dart';
@@ -362,12 +364,40 @@ class _AccountSettingsState extends State<_accountsettings> with AuthorizedQuery
   @override
   void initState() {
     super.initState();
-    _aboutMeController = TextEditingController(text: widget.user.aboutme ?? "");
-
-    //_adultContentEnabled = widget.user.adultContent ?? false;
-    // Set default timezone based on user data if available.
-    //_selectedTimezone = widget.user.timezone ?? "UTC";
+    _aboutMeController = TextEditingController();
   }
+
+  //-------------------------------------------------------------------------------
+
+  Future<userprefs?> getUserPreference(int userId) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('userPreferences')
+          .where('userId', isEqualTo: userId)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isEmpty) return null;
+
+      return userprefs.fromFirestore(snapshot.docs.first.data());
+    } catch (e) {
+      print('Error fetching user preferences: $e');
+      return null;
+    }
+  }
+
+  Future<void> updateUserPreference(userprefs preference) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('userPreferences')
+          .doc(preference.userId.toString())
+          .set(preference.toFirestore());
+    } catch (e) {
+      print('Error updating user preferences: $e');
+    }
+  }
+
+  //-------------------------------------------------------------------------------
 
   @override
   void dispose() {
@@ -376,81 +406,96 @@ class _AccountSettingsState extends State<_accountsettings> with AuthorizedQuery
   }
 
   void _submitSettings() async{
-    updateUserpreference((await DataHandler().readData()).accessToken, widget.user.id, _aboutMeController.text, _adultContentEnabled, _selectedTimezone);
+    final updatedPreference = userprefs(
+      userId: widget.user.id,
+      aboutMe: _aboutMeController.text,
+      adultContent: _adultContentEnabled,
+      timezone: _selectedTimezone,
+    );
+
+    await updateUserPreference(updatedPreference);
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Account Settings"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // About Me Text Field
-            const Text(
-              "About Me",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return FutureBuilder(
+        future: getUserPreference(widget.user.id),
+        builder: (context, Snapshot){
+          _aboutMeController.text = Snapshot.data!.aboutMe;
+          _selectedTimezone = Snapshot.data!.timezone;
+          _adultContentEnabled = Snapshot.data!.adultContent;
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Account Settings"),
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _aboutMeController,
-              maxLines: 4,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: "Tell us about yourself...",
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // About Me Text Field
+                  const Text(
+                    "About Me",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _aboutMeController,
+                    maxLines: 4,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "Tell us about yourself...",
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Timezone Dropdown
+                  const Text(
+                    "Timezone",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButton<String>(
+                    value: _selectedTimezone,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedTimezone = newValue!;
+                      });
+                    },
+                    items: const [
+                      DropdownMenuItem(value: "UTC", child: Text("UTC")),
+                      DropdownMenuItem(value: "GMT", child: Text("GMT")),
+                      DropdownMenuItem(value: "EST", child: Text("EST")),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Adult Content Switch
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Show Adult Content",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      Switch(
+                        value: _adultContentEnabled,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _adultContentEnabled = value;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            // Timezone Dropdown
-            const Text(
-              "Timezone",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            floatingActionButton: FloatingActionButton(
+              onPressed: _submitSettings,
+              child: const Icon(Icons.check),
             ),
-            const SizedBox(height: 8),
-            DropdownButton<String>(
-              value: _selectedTimezone,
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedTimezone = newValue!;
-                });
-              },
-              items: const [
-                DropdownMenuItem(value: "UTC", child: Text("UTC")),
-                DropdownMenuItem(value: "GMT", child: Text("GMT")),
-                DropdownMenuItem(value: "EST", child: Text("EST")),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Adult Content Switch
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Show Adult Content",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Switch(
-                  value: _adultContentEnabled,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _adultContentEnabled = value;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _submitSettings,
-        child: const Icon(Icons.check),
-      ),
+          );
+        }
     );
   }
 }

@@ -16,8 +16,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+
 void main() {
   usePathUrlStrategy();
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
   runApp(const Anarchist());
 }
 

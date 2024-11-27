@@ -9,6 +9,8 @@ environment:
 dependencies:
   cached_network_image: ^3.4.1
   catppuccin_flutter: ^1.0.0
+  cloud_firestore: ^5.5.0
+  firebase_core: ^3.8.0
   flutter:
     sdk: flutter
   flutter_localizations:
