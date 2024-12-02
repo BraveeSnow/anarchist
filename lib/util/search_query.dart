@@ -30,7 +30,7 @@ class SearchCard extends StatelessWidget {
     double cWidth = MediaQuery.of(context).size.width * 0.8;
     return GestureDetector(
       onTap: () {
-        context.go("/details/${entry.id}");
+        context.push("/details/${entry.id}");
       },
       child: Container(
         decoration: const BoxDecoration(color: Colors.black12),

@@ -269,6 +269,16 @@ class UserMediaEntryCard extends StatelessWidget {
               }
 
               // proceed with updating entry
+              final snackbar = SnackBar(
+                content: const Text("Undo Anime List Modifications?"),
+                duration: const Duration(seconds: 5),
+                action: SnackBarAction(
+                    label: "Undo",
+                    onPressed: () {
+                      entryUpdateCallback(userEntry.id, userEntry.status);
+                    }),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackbar);
               entryUpdateCallback(userEntry.id, selected);
               context.pop();
             },
